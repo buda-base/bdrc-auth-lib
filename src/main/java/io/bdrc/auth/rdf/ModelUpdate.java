@@ -48,14 +48,16 @@ public class ModelUpdate extends TimerTask{
             HttpResponse resp=client.execute(get);
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             resp.getEntity().writeTo(baos);
+            if(resp.getStatusLine().getStatusCode()!=200) {
+                throw new Exception("Update failed: "+AuthProps.getProperty("authUpdatePath")+ " is not available");
+            }
             lastUpdate = Long.parseLong(baos.toString());
             if(lastUpdate > time) {                
                 //do update
                 RdfAuthModel.update(lastUpdate);
             }
-        } catch (IOException e) {            
+        } catch (Exception e) {            
             e.printStackTrace();
         }
     }
-
 }
