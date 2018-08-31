@@ -1,10 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>bdrc-auth</groupId>
+  <groupId>io.bdrc</groupId>
   <artifactId>bdrc-auth-lib</artifactId>
+  <packaging>jar</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <name>bdrc-auth</name>
-  <description>Bdrc authorization library based on auth0</description>
+  <name>bdrc-auth-lib</name>
+  <description>BDRC authorization library based on auth0</description>
   <url>https://github.com/BuddhistDigitalResourceCenter/bdrc-auth-lib</url>
   <licenses>
         <license>
@@ -16,10 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jersey.version>2.27</jersey.version>
-    <jetty.version>9.4.9.v20180320</jetty.version>
-    <jena.version>3.7.0</jena.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jena.version>3.8.0</jena.version>
   </properties>
   <developers>
         <developer>
@@ -44,17 +42,6 @@
         <developerConnection>scm:git:ssh://github.com:BuddhistDigitalResourceCenter/bdrc-auth-lib.git</developerConnection>
         <url>http://github.com/BuddhistDigitalResourceCenter/bdrc-auth-lib/tree/master</url>
   </scm>
-  <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-  </dependencyManagement>
   <dependencies>
   <!-- https://mvnrepository.com/artifact/com.auth0/auth0 -->
     <dependency>
@@ -109,30 +96,9 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>include-deps</id>
-            <activation>
-                <property>
-                    <name>includeDeps</name>
-                    <value>true</value>
-                </property>
-            </activation>
-        </profile>
     </profiles>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
