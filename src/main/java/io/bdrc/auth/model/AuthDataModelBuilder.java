@@ -35,25 +35,25 @@ import io.bdrc.auth.rdf.RdfConstants;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
- * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
+ *
+ * If this file is a derivation of another work the license header will appear below;
+ * otherwise, this work is licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the License.
- * 
+ *
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class AuthDataModelBuilder {
-    
+
     ArrayList<Group> groups;
     ArrayList<Role> roles;
     ArrayList<Permission> permissions;
@@ -63,15 +63,15 @@ public class AuthDataModelBuilder {
     ArrayList<Application> apps;
     ArrayList<String> paths;
     Model model;
-    
+
     public final static Logger log=LoggerFactory.getLogger(AuthDataModelBuilder.class.getName());
-    
+
     public AuthDataModelBuilder() throws ClientProtocolException, IOException {
         log.info("URL >> "+AuthProps.getProperty("policiesUrl"));
         HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl")).openConnection();
         InputStream stream=connection.getInputStream();
-        //InputStream stream=AuthDataModelBuilder.class.getClassLoader().getResourceAsStream("policiesTest.ttl");  
-        Model authMod = ModelFactory.createDefaultModel();                      
+        //InputStream stream=AuthDataModelBuilder.class.getClassLoader().getResourceAsStream("policiesTest.ttl");
+        Model authMod = ModelFactory.createDefaultModel();
         authMod.read(stream, "", "TURTLE");
         stream.close();
         HttpClient client=HttpClientBuilder.create().build();
@@ -89,7 +89,7 @@ public class AuthDataModelBuilder {
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         response.getEntity().writeTo(baos);
-        String json_resp=baos.toString();        
+        String json_resp=baos.toString();
         baos.close();
         JsonNode node=mapper.readTree(json_resp);
         String token=node.findValue("access_token").asText();
@@ -116,13 +116,13 @@ public class AuthDataModelBuilder {
         response = client.execute(post);
         baos=new ByteArrayOutputStream();
         response.getEntity().writeTo(baos);
-        json_resp=baos.toString();        
+        json_resp=baos.toString();
         baos.close();
         node=mapper.readTree(json_resp);
         token=node.findValue("access_token").asText();
         setApps(token);
     }
-    
+
     private void setApps(String token) throws ClientProtocolException, IOException {
         apps=new ArrayList<>();
         HttpClient client=HttpClientBuilder.create().build();
@@ -141,7 +141,7 @@ public class AuthDataModelBuilder {
         }
         baos.close();
     }
-    
+
     private void setGroups(String token) throws ClientProtocolException, IOException {
         groups=new ArrayList<>();
         ObjectMapper mapper=new ObjectMapper();
@@ -154,13 +154,13 @@ public class AuthDataModelBuilder {
         JsonNode node1=mapper.readTree(baos.toString());
         baos.close();
         Iterator<JsonNode> it=node1.at("/groups").elements();
-        while(it.hasNext()) { 
+        while(it.hasNext()) {
             Group gp=new Group(it.next());
             groups.add(gp);
-            model.add(gp.getModel());          
+            model.add(gp.getModel());
         }
     }
-    
+
     private void setRoles(String token) throws ClientProtocolException, IOException {
         roles=new ArrayList<>();
         ObjectMapper mapper=new ObjectMapper();
@@ -173,13 +173,13 @@ public class AuthDataModelBuilder {
         JsonNode node1=mapper.readTree(baos.toString());
         baos.close();
         Iterator<JsonNode> it=node1.at("/roles").elements();
-        while(it.hasNext()) { 
+        while(it.hasNext()) {
             Role role=new Role(it.next());
             roles.add(role);
-            model.add(role.getModel());          
+            model.add(role.getModel());
         }
     }
-    
+
     private void setPermissions(String token) throws ClientProtocolException, IOException {
         permissions=new ArrayList<>();
         ObjectMapper mapper=new ObjectMapper();
@@ -192,13 +192,13 @@ public class AuthDataModelBuilder {
         JsonNode node1=mapper.readTree(baos.toString());
         baos.close();
         Iterator<JsonNode> it=node1.at("/permissions").elements();
-        while(it.hasNext()) {  
+        while(it.hasNext()) {
             Permission perm=new Permission(it.next());
             permissions.add(perm);
-            model.add(perm.getModel());          
+            model.add(perm.getModel());
         }
     }
-    
+
     private void setUsers(String token) throws ClientProtocolException, IOException {
         users=new ArrayList<>();
         ObjectMapper mapper=new ObjectMapper();
@@ -214,13 +214,12 @@ public class AuthDataModelBuilder {
         while(it.hasNext()) {
             JsonNode tmp=it.next();
             String authId=tmp.findValue("user_id").asText();
-            User user=new User(tmp,getUserRoles(token,authId.replace("|", "%7C")));            
+            User user=new User(tmp,getUserRoles(token,authId.replace("|", "%7C")));
             users.add(user);
-            System.out.println(user.getModel());
             model.add(user.getModel());
         }
     }
-    
+
     private ArrayList<String> getUserRoles(String token,String id) throws ClientProtocolException, IOException {
         ArrayList<String> roleList=new ArrayList<>();
         ObjectMapper mapper=new ObjectMapper();
@@ -232,15 +231,15 @@ public class AuthDataModelBuilder {
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         resp.getEntity().writeTo(baos);
         JsonNode node1=mapper.readTree(baos.toString());
-        baos.close();       
+        baos.close();
         Iterator<JsonNode> it=node1.elements();
-        while(it.hasNext()) { 
+        while(it.hasNext()) {
             roleList.add(getJsonValue(it.next(),"_id"));
         }
         //System.out.println("user >> "+id+" Roles >> "+roleList);
         return roleList;
     }
-    
+
     private void setEndpoints(Model authMod) throws ClientProtocolException, IOException {
         endpoints=new ArrayList<>();
         paths=new ArrayList<>();
@@ -251,11 +250,11 @@ public class AuthDataModelBuilder {
         while(ext.hasNext()) {
             String st=ext.next().getSubject().getURI();
             Endpoint end=new Endpoint(authMod,st);
-            endpoints.add(end); 
+            endpoints.add(end);
             paths.add(end.getPath());
         }
     }
-    
+
     private void setResourceAccess(Model authMod) throws ClientProtocolException, IOException {
         access=new ArrayList<>();
         Triple t=new Triple(org.apache.jena.graph.Node.ANY,RDF.type.asNode(),
@@ -264,7 +263,7 @@ public class AuthDataModelBuilder {
         while(ext.hasNext()) {
             String st=ext.next().getSubject().getURI();
             ResourceAccess acc=new ResourceAccess(authMod,st);
-            access.add(acc); 
+            access.add(acc);
         }
     }
 
@@ -279,14 +278,14 @@ public class AuthDataModelBuilder {
         }
         return "";
     }
-    
+
     @Override
     public String toString() {
         return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions
                 + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths="
                 + paths + ", model=" + model + "]";
     }
-    
+
     public static void main(String[] args) throws ClientProtocolException, IOException {
         AuthProps.initForTests();
         AuthDataModelBuilder aut=new AuthDataModelBuilder();
