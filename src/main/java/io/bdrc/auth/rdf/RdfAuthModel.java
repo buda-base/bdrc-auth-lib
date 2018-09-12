@@ -66,8 +66,9 @@ public class RdfAuthModel implements Runnable{
     private static final int DELAY_MS = 5000;
     public final static Logger log=LoggerFactory.getLogger(RdfAuthModel.class.getName());
 
+    //Reads authModel from fuseki and starts a ModelUpdate timer
     public static void init() {
-        updateAuthData(null);
+        readAuthModel();
         ModelUpdate task = new ModelUpdate();
         Timer timer = new Timer();
         timer.schedule(task, DELAY_MS, PERIOD_MS);
@@ -78,7 +79,6 @@ public class RdfAuthModel implements Runnable{
     }
 
     public static void update(long updatedTime) {
-        resetModel(authMod);
         updated=updatedTime;
     }
 
@@ -326,27 +326,21 @@ public class RdfAuthModel implements Runnable{
         return null;
     }
 
-    /*static void reloadModel() {
-        HttpURLConnection connection;
-        Model m = ModelFactory.createDefaultModel();
-        try {
-            connection = (HttpURLConnection) new URL(AuthProps.getProperty("updateModelUrl")).openConnection();
-            InputStream stream=connection.getInputStream();
-            m = ModelFactory.createDefaultModel();
-            m.read(stream, "", "TURTLE");
-            stream.close();
-            authMod=m;
-            getUsers();
-            getGroups();
-            getRoles();
-            getPermissions();
-            getEndpoints();
-            getApplications();
-            getResourceAccess();
-        } catch (IOException e) {
-            e.printStackTrace();
+    //Loads the model from fuseki -
+    //Used by any application using bdrc-auth-lib
+    //The model will then be updated (by ModelUpdate timer)
+    //each when a new version has been created and published
+    //by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib repo
+    public static void readAuthModel() {
+        String fusekiUrl=AuthProps.getProperty("fusekiUrl");
+        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
+        DatasetAccessor access=DatasetAccessorFactory.createHTTP(fusekiUrl);
+        Model m=access.getModel(AuthProps.getProperty("authDataGraph"));
+        if(m!=null) {
+            resetModel(m);
+            update(System.currentTimeMillis());
         }
-    }*/
+    }
 
     static void resetModel(Model m) {
         authMod=m;
@@ -357,8 +351,13 @@ public class RdfAuthModel implements Runnable{
         getEndpoints();
         getApplications();
         getResourceAccess();
+        update(System.currentTimeMillis());
     }
 
+    //Reloads and reset the model from auth0 and bdrc-auth-lib policies.ttl
+    //This MUST BE used at startup by the server implementing webhooks callbacks
+    //and each time a callback to that server is triggerred.
+    //a new update time is then set by resetModel().
     public static void updateAuthData(String fusekiUrl) {
         if(fusekiUrl == null) {
             fusekiUrl=AuthProps.getProperty("fusekiUrl");
@@ -385,7 +384,6 @@ public class RdfAuthModel implements Runnable{
     public void run() {
         try {
             updateAuthData(null);
-            update(System.currentTimeMillis());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
