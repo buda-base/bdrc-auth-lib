@@ -53,7 +53,7 @@ public class ModelUpdate extends TimerTask {
             resp.getEntity().writeTo(baos);
             final long lastDistUpdate = Long.parseLong(baos.toString());
             if (lastDistUpdate > lastLocalUpdate) {
-                RdfAuthModel.update(lastDistUpdate);
+                RdfAuthModel.readAuthModel();
             }
         } catch (Exception e) {
             log.error("error running ModelUpdate", e);

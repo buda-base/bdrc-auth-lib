@@ -19,7 +19,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -70,6 +69,9 @@ public class AuthDataModelBuilder {
 
     public final static Logger log = LoggerFactory.getLogger(AuthDataModelBuilder.class.getName());
 
+    public static final String webTaskBaseUrl = "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/";
+    public static final String auth0BaseUrl = "https://bdrc-io.auth0.com/";
+
     public AuthDataModelBuilder() throws ClientProtocolException, IOException {
         log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
         final HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl"))
@@ -81,7 +83,7 @@ public class AuthDataModelBuilder {
         authMod.read(stream, "", "TURTLE");
         stream.close();
         HttpClient client = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost("https://bdrc-io.auth0.com/oauth/token");
+        HttpPost post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
@@ -108,12 +110,12 @@ public class AuthDataModelBuilder {
         setResourceAccess(authMod);
         // Apps require a call with a different audience
         client = HttpClientBuilder.create().build();
-        post = new HttpPost("https://bdrc-io.auth0.com/oauth/token");
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
         json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience", "https://bdrc-io.auth0.com/api/v2/");
+        json.put("audience", auth0BaseUrl + "api/v2/");
         post_data = mapper.writer().writeValueAsString(json);
         se = new StringEntity(post_data);
         se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
@@ -132,7 +134,7 @@ public class AuthDataModelBuilder {
         apps = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
         final HttpGet get = new HttpGet(
-                "https://bdrc-io.auth0.com/api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
+                auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -151,7 +153,7 @@ public class AuthDataModelBuilder {
         groups = new ArrayList<>();
 
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/groups");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "groups");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -169,7 +171,7 @@ public class AuthDataModelBuilder {
     private void setRoles(final String token) throws ClientProtocolException, IOException {
         roles = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/roles");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "roles");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -186,18 +188,17 @@ public class AuthDataModelBuilder {
 
     private void setPermissions(String token) throws ClientProtocolException, IOException {
         permissions = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/permissions");
+        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "permissions");
         get.addHeader("Authorization", "Bearer " + token);
-        HttpResponse resp = client.execute(get);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final HttpResponse resp = client.execute(get);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         resp.getEntity().writeTo(baos);
-        JsonNode node1 = mapper.readTree(baos.toString());
+        final JsonNode node1 = mapper.readTree(baos.toString());
         baos.close();
-        Iterator<JsonNode> it = node1.at("/permissions").elements();
+        final Iterator<JsonNode> it = node1.at("/permissions").elements();
         while (it.hasNext()) {
-            Permission perm = new Permission(it.next());
+            final Permission perm = new Permission(it.next());
             permissions.add(perm);
             model.add(perm.getModel());
         }
@@ -205,38 +206,35 @@ public class AuthDataModelBuilder {
 
     private void setUsers(String token) throws ClientProtocolException, IOException {
         users = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/users");
+        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "users");
         get.addHeader("Authorization", "Bearer " + token);
-        HttpResponse resp = client.execute(get);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final HttpResponse resp = client.execute(get);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         resp.getEntity().writeTo(baos);
-        JsonNode node1 = mapper.readTree(baos.toString());
+        final JsonNode node1 = mapper.readTree(baos.toString());
         baos.close();
-        Iterator<JsonNode> it = node1.at("/users").elements();
+        final Iterator<JsonNode> it = node1.at("/users").elements();
         while (it.hasNext()) {
-            JsonNode tmp = it.next();
-            String authId = tmp.findValue("user_id").asText();
-            User user = new User(tmp, getUserRoles(token, authId.replace("|", "%7C")));
+            final JsonNode tmp = it.next();
+            final String authId = tmp.findValue("user_id").asText();
+            final User user = new User(tmp, getUserRoles(token, authId.replace("|", "%7C")));
             users.add(user);
             model.add(user.getModel());
         }
     }
 
     private ArrayList<String> getUserRoles(String token, String id) throws ClientProtocolException, IOException {
-        ArrayList<String> roleList = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet(
-                "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/users/" + id + "/roles/calculate");
+        final ArrayList<String> roleList = new ArrayList<>();
+        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "users/" + id + "/roles/calculate");
         get.addHeader("Authorization", "Bearer " + token);
-        HttpResponse resp = client.execute(get);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final HttpResponse resp = client.execute(get);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         resp.getEntity().writeTo(baos);
-        JsonNode node1 = mapper.readTree(baos.toString());
+        final JsonNode node1 = mapper.readTree(baos.toString());
         baos.close();
-        Iterator<JsonNode> it = node1.elements();
+        final Iterator<JsonNode> it = node1.elements();
         while (it.hasNext()) {
             roleList.add(getJsonValue(it.next(), "_id"));
         }
@@ -247,13 +245,11 @@ public class AuthDataModelBuilder {
     private void setEndpoints(Model authMod) throws ClientProtocolException, IOException {
         endpoints = new ArrayList<>();
         paths = new ArrayList<>();
-        Triple t = new Triple(org.apache.jena.graph.Node.ANY,
-                NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                NodeFactory.createURI("http://purl.bdrc.io/ontology/ext/auth/Endpoint"));
-        ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
+        final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.ENDPOINT.asNode());
+        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
         while (ext.hasNext()) {
-            String st = ext.next().getSubject().getURI();
-            Endpoint end = new Endpoint(authMod, st);
+            final String st = ext.next().getSubject().getURI();
+            final Endpoint end = new Endpoint(authMod, st);
             endpoints.add(end);
             paths.add(end.getPath());
         }
@@ -262,7 +258,7 @@ public class AuthDataModelBuilder {
     private void setResourceAccess(Model authMod) throws ClientProtocolException, IOException {
         access = new ArrayList<>();
         final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.RES_ACCESS.asNode());
-        ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
+        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
         while (ext.hasNext()) {
             final String st = ext.next().getSubject().getURI();
             final ResourceAccess acc = new ResourceAccess(authMod, st);

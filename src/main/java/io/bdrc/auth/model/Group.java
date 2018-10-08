@@ -105,29 +105,23 @@ public class Group {
         return res;
     }
 
-    @Override
-    public String toString() {
-        return "Group [id=" + id + ", name=" + name + ", desc=" + desc + ", members=" + members + ", roles=" + roles
-                + ", model=" + model + "]";
-    }
-
-    public void setMembers(ArrayList<String> members) {
+    public void setMembers(final ArrayList<String> members) {
         this.members = members;
     }
 
-    public void setRoles(ArrayList<String> roles) {
+    public void setRoles(final ArrayList<String> roles) {
         this.roles = roles;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDesc(String desc) {
+    public void setDesc(final String desc) {
         this.desc = desc;
     }
 
@@ -165,6 +159,12 @@ public class Group {
 
     public boolean isMember(String member) {
         return members.contains(member);
+    }
+
+    @Override
+    public String toString() {
+        return "Group [id=" + id + ", name=" + name + ", desc=" + desc + ", members=" + members + ", roles=" + roles
+                + ", model=" + model + "]";
     }
 
 }
