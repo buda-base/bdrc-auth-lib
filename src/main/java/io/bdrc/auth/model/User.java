@@ -6,127 +6,100 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.auth.rdf.RdfConstants;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
- * (the "License"); you may not use this file except in compliance with the License.
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
  * 
  * You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class User {
-    
+
     String id;
     String authId;
     String name;
     String email;
-    String asJson;
     String isSocial;
     String provider;
     String connection;
     ArrayList<String> roles;
     ArrayList<String> groups;
     Model model;
-    
-    public User(JsonNode json,ArrayList<String> roles) throws JsonProcessingException {        
-        authId=getJsonValue(json,"user_id");
-        name=getJsonValue(json,"name");
-        email=getJsonValue(json,"email");
-        this.roles=roles; 
-        groups=new ArrayList<>();
-        JsonNode ids=json.findValue("identities");
-        if(ids!=null) {
-            isSocial=getJsonValue(ids,"isSocial");
-            id=getJsonValue(ids,"user_id");
-            provider=getJsonValue(ids,"provider");
-            connection=getJsonValue(ids,"connection");
+
+    public User(final JsonNode json, final ArrayList<String> roles) throws JsonProcessingException {
+        authId = getJsonValue(json, "user_id");
+        name = getJsonValue(json, "name");
+        email = getJsonValue(json, "email");
+        this.roles = roles;
+        groups = new ArrayList<>();
+        final JsonNode ids = json.findValue("identities");
+        if (ids != null) {
+            isSocial = getJsonValue(ids, "isSocial");
+            id = getJsonValue(ids, "user_id");
+            provider = getJsonValue(ids, "provider");
+            connection = getJsonValue(ids, "connection");
         }
-        ObjectMapper mapper = new ObjectMapper();
-        asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        model=buildModel();
+        model = buildModel();
     }
-    
+
     public User() {
-        authId="";
-        name="";
-        email="";
-        isSocial="";
-        id="";
-        provider="";
-        connection="";
-        asJson="";
-        roles=new ArrayList<>();
-        groups=new ArrayList<>();
-        model=null;
+        authId = "";
+        name = "";
+        email = "";
+        isSocial = "";
+        id = "";
+        provider = "";
+        connection = "";
+        roles = new ArrayList<>();
+        groups = new ArrayList<>();
+        model = null;
     }
 
     Model buildModel() {
-        Resource usr= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+id);
-        model = ModelFactory.createDefaultModel();
-        model.getNsPrefixMap().put("foaf", "http://xmlns.com/foaf/0.1/");
-        model.add(ResourceFactory.createStatement(usr,RDF.type,ResourceFactory.createResource(RdfConstants.USER)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.IS_SOCIAL), 
-                ResourceFactory.createPlainLiteral(isSocial)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.PROVIDER), 
-                ResourceFactory.createPlainLiteral(provider)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.CONNECTION), 
-                ResourceFactory.createPlainLiteral(connection)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.FOAF_NAME), 
-                ResourceFactory.createPlainLiteral(name)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.ID), 
-                ResourceFactory.createPlainLiteral(authId)));
-        model.add(ResourceFactory.createStatement(
-                usr, 
-                ResourceFactory.createProperty(RdfConstants.FOAF_MBOX), 
-                ResourceFactory.createPlainLiteral(email)));
-        for(String role:roles) {
-            model.add(ResourceFactory.createStatement(
-                    usr, 
-                    ResourceFactory.createProperty(RdfConstants.HAS_ROLE), 
-                    ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+role)));
+        Resource usr = ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + id);
+        final Model res = ModelFactory.createDefaultModel();
+        res.add(usr, RDF.type, RdfConstants.USER);
+        res.add(usr, RdfConstants.IS_SOCIAL, ResourceFactory.createStringLiteral(isSocial));
+        res.add(usr, RdfConstants.PROVIDER, ResourceFactory.createStringLiteral(provider));
+        res.add(usr, RdfConstants.CONNECTION, ResourceFactory.createStringLiteral(connection));
+        res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
+        res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
+        res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));
+        for (String role : roles) {
+            res.add(usr, RdfConstants.HAS_ROLE, ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
         }
-        return model;
+        return res;
     }
-    
-    
-    
-    String getJsonValue(JsonNode json,String key) {
-        JsonNode tmp=json.findValue(key);
-        if(tmp!=null) {
+
+    String getJsonValue(final JsonNode json, final String key) {
+        final JsonNode tmp = json.findValue(key);
+        if (tmp != null) {
             return tmp.asText();
         }
         return "";
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
@@ -158,7 +131,7 @@ public class User {
     public ArrayList<String> getRoles() {
         return roles;
     }
-    
+
     public ArrayList<String> getGroups() {
         return groups;
     }
@@ -179,11 +152,6 @@ public class User {
         return model;
     }
 
-    
-    public String getAsJson() {
-        return asJson;
-    }
-    
     public String getId() {
         return id;
     }
@@ -202,9 +170,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", authId=" + authId + ", name=" + name + ", email=" + email + ", asJson=" + asJson
-                + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles="
-                + roles + ", groups=" + groups + ", model=" + model + "]";
+        return "User [id=" + id + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial="
+                + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles=" + roles + ", groups="
+                + groups + ", model=" + model + "]";
     }
 
 }

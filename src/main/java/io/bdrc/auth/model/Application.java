@@ -9,84 +9,75 @@ import org.apache.jena.vocabulary.RDFS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.bdrc.auth.rdf.RdfConstants;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
- * (the "License"); you may not use this file except in compliance with the License.
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
  * 
  * You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class Application {
-    
+
     String appType;
     String appId;
     String name;
     String desc;
-    String asJson;
     Model model;
-    
-    public Application(JsonNode json) throws JsonProcessingException {        
-        name=getJsonValue(json,"name");
-        desc=getJsonValue(json,"description");
-        appType=getJsonValue(json,"app_type");
-        appId=getJsonValue(json,"client_id");
-        ObjectMapper mapper = new ObjectMapper();
-        asJson=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        model=buildModel();
+
+    public Application(final JsonNode json) throws JsonProcessingException {
+        name = getJsonValue(json, "name");
+        desc = getJsonValue(json, "description");
+        appType = getJsonValue(json, "app_type");
+        appId = getJsonValue(json, "client_id");
+        model = buildModel();
     }
-    
+
     public Application() {
-        name="";
-        desc="";
-        appType="";
-        appId="";
+        name = "";
+        desc = "";
+        appType = "";
+        appId = "";
     }
 
     Model buildModel() {
-        Resource app= ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE+appId);
-        model = ModelFactory.createDefaultModel();
-        model.add(ResourceFactory.createStatement(app,RDF.type,ResourceFactory.createResource(RdfConstants.APPLICATION)));
-        model.add(ResourceFactory.createStatement(app,RDFS.label,ResourceFactory.createPlainLiteral(name)));
-        model.add(ResourceFactory.createStatement(
-                app, 
-                ResourceFactory.createProperty(RdfConstants.APPTYPE), 
-                ResourceFactory.createPlainLiteral(appType)));
-        model.add(ResourceFactory.createStatement(
-                app, 
-                ResourceFactory.createProperty(RdfConstants.DESC), 
-                ResourceFactory.createPlainLiteral(desc)));
-        return model;
+        final Resource app = ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + appId);
+        final Model res = ModelFactory.createDefaultModel();
+        res.add(app, RDF.type, RdfConstants.APPLICATION);
+        res.add(app, RDFS.label, ResourceFactory.createStringLiteral(name));
+        res.add(app, RdfConstants.APPTYPE, ResourceFactory.createStringLiteral(appType));
+        res.add(app, RdfConstants.DESC, ResourceFactory.createStringLiteral(desc));
+        return res;
     }
-    
-    public void setAppType(String appType) {
+
+    public void setAppType(final String appType) {
         this.appType = appType;
     }
 
-    public void setAppId(String appId) {
+    public void setAppId(final String appId) {
         this.appId = appId;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDesc(String desc) {
+    public void setDesc(final String desc) {
         this.desc = desc;
     }
 
@@ -106,17 +97,13 @@ public class Application {
         return desc;
     }
 
-    public String getAsJson() {
-        return asJson;
-    }
-
     public Model getModel() {
         return model;
     }
 
-    String getJsonValue(JsonNode json,String key) {
-        JsonNode tmp=json.findValue(key);
-        if(tmp!=null) {
+    String getJsonValue(final JsonNode json, final String key) {
+        final JsonNode tmp = json.findValue(key);
+        if (tmp != null) {
             return tmp.asText();
         }
         return "";
@@ -124,10 +111,8 @@ public class Application {
 
     @Override
     public String toString() {
-        return "Application [appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc=" + desc
-                + ", asJson=" + asJson + ", model=" + model + "]";
+        return "Application [appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc=" + desc + ", model="
+                + model + "]";
     }
-    
-    
 
 }

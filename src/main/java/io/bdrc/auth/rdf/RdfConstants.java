@@ -1,61 +1,70 @@
 package io.bdrc.auth.rdf;
 
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
- * (the "License"); you may not use this file except in compliance with the License.
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
  * 
  * You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class RdfConstants {
-    
-    public static final String AUTH_RESOURCE="http://purl.bdrc.io/resource-auth/";
-    public static final String APPLICATION="http://purl.bdrc.io/ontology/ext/auth/Application";
-    public static final String PERMISSION="http://purl.bdrc.io/ontology/ext/auth/Permission";
-    public static final String ROLE="http://purl.bdrc.io/ontology/ext/auth/Role";    
-    public static final String GROUP="http://purl.bdrc.io/ontology/ext/auth/Group";
-    public static final String USER="http://purl.bdrc.io/ontology/ext/auth/User";
-    public static final String ENDPOINT="http://purl.bdrc.io/ontology/ext/auth/Endpoint";
-    public static final String RES_ACCESS="http://purl.bdrc.io/ontology/ext/auth/ResourceAccess";
-    
-    public final static String APPID="http://purl.bdrc.io/ontology/ext/auth/appId";
-    public final static String APPTYPE="http://purl.bdrc.io/ontology/ext/auth/appType";
-    public final static String PATH="http://purl.bdrc.io/ontology/ext/auth/path";
-    public final static String FOR_ROLE="http://purl.bdrc.io/ontology/ext/auth/forRole";
-    public final static String FOR_GROUP="http://purl.bdrc.io/ontology/ext/auth/forGroup";
-    public final static String FOR_PERM="http://purl.bdrc.io/ontology/ext/auth/forPermission";
-    public final static String DESC="http://purl.bdrc.io/ontology/ext/auth/desc";
-    public final static String HAS_MEMBER="http://purl.bdrc.io/ontology/ext/auth/hasMember";
-    public final static String HAS_ROLE="http://purl.bdrc.io/ontology/ext/auth/hasRole";
-    public final static String HAS_PERMISSION="http://purl.bdrc.io/ontology/ext/auth/hasPermission";
-    public final static String IS_SOCIAL="http://purl.bdrc.io/ontology/ext/auth/isSocial";
-    public final static String PROVIDER="http://purl.bdrc.io/ontology/ext/auth/provider";
-    public final static String CONNECTION="http://purl.bdrc.io/ontology/ext/auth/connection";
-    public final static String ID="http://purl.bdrc.io/ontology/ext/auth/id";
-    public final static String POLICY="http://purl.bdrc.io/ontology/ext/auth/policy";
-    
-    public final static String FOAF_NAME="http://xmlns.com/foaf/0.1/name";
-    public final static String FOAF_MBOX="http://xmlns.com/foaf/0.1/mbox";
-    
-    public static final String RESTRICTED_SEALED="AccessRestrictedSealed";
-    public static final String RESTRICTED_CHINA="AccessRestrictedInChina";
-    public static final String OPEN="AccessOpen";
-    public static final String RESTRICTED_TEMP="AccessRestrictedTemporarily";
-    public static final String RESTRICTED_BY_QUALITY="AccessRestrictedByQuality";
-    public static final String MIXED="AccessMixed";
-    public static final String RESTRICTED_BY_TBRC="AccessRestrictedByTbrc";
-    public static final String FAIR_USE="AccessFairUse";
+
+    public static final String AUTH_RESOURCE_BASE = "http://purl.bdrc.io/resource-auth/";
+    public static final String AUTH_VOC_BASE = "http://purl.bdrc.io/ontology/ext/auth/";
+    public static final Resource APPLICATION = ResourceFactory.createResource(AUTH_VOC_BASE + "Application");
+    public static final Resource PERMISSION = ResourceFactory.createResource(AUTH_VOC_BASE + "Permission");
+    public static final Resource ROLE = ResourceFactory.createResource(AUTH_VOC_BASE + "Role");
+    public static final Resource GROUP = ResourceFactory.createResource(AUTH_VOC_BASE + "Group");
+    public static final Resource USER = ResourceFactory.createResource(AUTH_VOC_BASE + "User");
+    public static final Resource ENDPOINT = ResourceFactory.createResource(AUTH_VOC_BASE + "Endpoint");
+    public static final Resource RES_ACCESS = ResourceFactory.createResource(AUTH_VOC_BASE + "ResourceAccess");
+
+    public final static Property APPID = ResourceFactory.createProperty(AUTH_VOC_BASE + "appId");
+    public final static String APPID_URI = AUTH_VOC_BASE + "appId";
+    public final static Property AUTHID = ResourceFactory.createProperty(AUTH_VOC_BASE + "authId");
+    public final static Property APPTYPE = ResourceFactory.createProperty(AUTH_VOC_BASE + "appType");
+    public final static Property PATH = ResourceFactory.createProperty(AUTH_VOC_BASE + "path");
+    public final static String PATH_URI = AUTH_VOC_BASE + "path";
+    public final static Property FOR_ROLE = ResourceFactory.createProperty(AUTH_VOC_BASE + "forRole");
+    public final static String FOR_ROLE_URI = AUTH_VOC_BASE + "forRole";
+    public final static Property FOR_GROUP = ResourceFactory.createProperty(AUTH_VOC_BASE + "forGroup");
+    public final static String FOR_GROUP_URI = AUTH_VOC_BASE + "forGroup";
+    public final static Property FOR_PERM = ResourceFactory.createProperty(AUTH_VOC_BASE + "forPermission");
+    public final static String FOR_PERM_URI = AUTH_VOC_BASE + "forPermission";
+    public final static Property DESC = ResourceFactory.createProperty(AUTH_VOC_BASE + "desc");
+    public final static Property HAS_MEMBER = ResourceFactory.createProperty(AUTH_VOC_BASE + "hasMember");
+    public final static Property HAS_ROLE = ResourceFactory.createProperty(AUTH_VOC_BASE + "hasRole");
+    public final static Property HAS_PERMISSION = ResourceFactory.createProperty(AUTH_VOC_BASE + "hasPermission");
+    public final static Property IS_SOCIAL = ResourceFactory.createProperty(AUTH_VOC_BASE + "isSocial");
+    public final static Property PROVIDER = ResourceFactory.createProperty(AUTH_VOC_BASE + "provider");
+    public final static Property CONNECTION = ResourceFactory.createProperty(AUTH_VOC_BASE + "connection");
+    public final static Property POLICY = ResourceFactory.createProperty(AUTH_VOC_BASE + "policy");
+    public final static String POLICY_URI = AUTH_VOC_BASE + "policy";
+
+    public static final String RESTRICTED_SEALED = "AccessRestrictedSealed";
+    public static final String RESTRICTED_CHINA = "AccessRestrictedInChina";
+    public static final String OPEN = "AccessOpen";
+    public static final String RESTRICTED_TEMP = "AccessRestrictedTemporarily";
+    public static final String RESTRICTED_BY_QUALITY = "AccessRestrictedByQuality";
+    public static final String MIXED = "AccessMixed";
+    public static final String RESTRICTED_BY_TBRC = "AccessRestrictedByTbrc";
+    public static final String FAIR_USE = "AccessFairUse";
 
 }

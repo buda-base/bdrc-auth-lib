@@ -26,18 +26,18 @@ import io.bdrc.auth.rdf.RdfConstants;
 
 public class Access {
     
-    UserProfile user;
-    Endpoint endpoint; 
+    final UserProfile user;
+    final Endpoint endpoint; 
         
-    public Access(UserProfile user, Endpoint endpoint) {
+    public Access(final UserProfile user, final Endpoint endpoint) {
         super();
         this.user = user;
         this.endpoint = endpoint;
     }
     
     public Access() {
-        this.user=new UserProfile();
-        this.endpoint=new Endpoint();
+        this.user = new UserProfile();
+        this.endpoint = new Endpoint();
     }
     
     public boolean hasEndpointAccess() {
@@ -52,7 +52,7 @@ public class Access {
     }
     
     public boolean matchGroup() {
-        boolean match=false;         
+        boolean match = false;         
         for(String gp:user.getGroups()) {
             if(endpoint.getGroups().contains(gp)) {
                 return true;
@@ -62,7 +62,7 @@ public class Access {
     }
     
     public boolean matchRole() {
-        boolean match=false;         
+        boolean match = false;         
         for(String r:user.getRoles()) {
             if(endpoint.getRoles().contains(r)) {
                 return true;
@@ -72,7 +72,7 @@ public class Access {
     }
     
     public boolean matchPermissions() {
-        boolean match=false;         
+        boolean match = false;         
         for(String pm:user.getPermissions()) {            
             if(endpoint.getPermissions().contains(pm)) {
                 return true;
@@ -81,27 +81,24 @@ public class Access {
         return match;
     }
     
-    public boolean matchResourcePermissions(String accessType) {
+    public boolean matchResourcePermissions(final String accessType) {
         if(accessType.equals(RdfConstants.OPEN)) {
             return true;
         }
-        boolean match=false;
-        ResourceAccess access=RdfAuthModel.getResourceAccess(accessType);
-        if(access!=null) {
-            for(String pm:user.getPermissions()) {
+        final ResourceAccess access = RdfAuthModel.getResourceAccess(accessType);
+        if(access != null) {
+            for(final String pm: user.getPermissions()) {
                 if(access.getPermission().equals(pm)) {
                     return true;
                 }
             }
         }
-        return match;
+        return false;
     }
 
     @Override
     public String toString() {
         return "Access [user=" + user + ", endpoint=" + endpoint + "]";
     }
-    
-    
 
 }
