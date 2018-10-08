@@ -59,7 +59,7 @@ public class RdfAuthModel implements Runnable {
     static ArrayList<ResourceAccess> access;
     static ArrayList<Application> applications;
     static HashMap<String, ArrayList<String>> paths;
-    static long updated;
+    static Long updated = null;
 
     private static final int PERIOD_MS = Integer.parseInt(AuthProps.getProperty("updatePeriod"));
     private static final int DELAY_MS = 5000;
@@ -68,16 +68,16 @@ public class RdfAuthModel implements Runnable {
     // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void init() {
         readAuthModel();
-        ModelUpdate task = new ModelUpdate();
-        Timer timer = new Timer();
+        final ModelUpdate task = new ModelUpdate();
+        final Timer timer = new Timer();
         timer.schedule(task, DELAY_MS, PERIOD_MS);
     }
 
-    public static long getUpdated() {
+    public static Long getUpdated() {
         return updated;
     }
 
-    public static void update(long updatedTime) {
+    public static void update(final long updatedTime) {
         updated = updatedTime;
     }
 
@@ -85,8 +85,8 @@ public class RdfAuthModel implements Runnable {
         return authMod;
     }
 
-    public static boolean isSecuredEndpoint(String appId, String path) {
-        ArrayList<String> pth = paths.get(appId);
+    public static boolean isSecuredEndpoint(final String appId, final String path) {
+        final ArrayList<String> pth = paths.get(appId);
         if (pth != null) {
             return pth.contains(path);
         }
@@ -380,8 +380,7 @@ public class RdfAuthModel implements Runnable {
         try {
             updateAuthData(null);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Running error", e);
         }
         log.info("Done loading and updating rdfAuth Model");
     }

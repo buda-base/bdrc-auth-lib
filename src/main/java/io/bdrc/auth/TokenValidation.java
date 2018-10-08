@@ -1,9 +1,5 @@
 package io.bdrc.auth;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -11,10 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Claim;
@@ -23,131 +16,109 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  * 
- * If this file is a derivation of another work the license header will appear below; 
- * otherwise, this work is licensed under the Apache License, Version 2.0 
- * (the "License"); you may not use this file except in compliance with the License.
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
  * 
  * You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
 
 public class TokenValidation {
-    
-    public final static Logger log=LoggerFactory.getLogger(TokenValidation.class.getName());
+
+    public final static Logger log = LoggerFactory.getLogger(TokenValidation.class.getName());
     DecodedJWT decodedJwt;
     List<String> scopes;
-    UserProfile user;    
-    String token;
+    UserProfile user;
+    final String tokenStr;
     boolean valid;
-        
-    public TokenValidation(String token) {
-        super();        
-        this.token = token;        
+
+    public TokenValidation(final String tokenStr) {
+        this.tokenStr = tokenStr;
         try {
-            valid = checkTokenValidity()
-                    & checkTokenSignature()
-                    & validateTokenKeyId();
+            valid = checkTokenSignature() & validateTokenKeyId();
             setScopes();
-            user=new UserProfile(decodedJwt);
-        } catch (IllegalArgumentException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException
-                | IOException e) {
-            // TODO Auto-generated catch block
+            user = new UserProfile(decodedJwt);
+        } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
-        }        
-    }
-    
-    void setScopes() {
-        Claim cl=decodedJwt.getClaims().get("scope");
-        if(cl!=null) {        
-            scopes=Arrays.asList(cl.asString().split(" "));
-        }else {
-            scopes=Arrays.asList("".split(" "));
         }
     }
-    
+
+    void setScopes() {
+        final Claim cl = decodedJwt.getClaims().get("scope");
+        if (cl != null) {
+            scopes = Arrays.asList(cl.asString().split(" "));
+        } else {
+            scopes = Arrays.asList("".split(" "));
+        }
+    }
+
     public boolean isValid() {
         return valid;
     }
-    
-    public boolean isValidScope(String scope) {
+
+    public boolean isValidScope(final String scope) {
         return scopes.contains(scope);
     }
 
-    public boolean checkTokenValidity() {
-        try {
-            decodedJwt = JWT.decode(token);            
-            return true;
-        }
-        catch(JWTDecodeException e) {
-            return false;
-        }
-    }
-    
-    public List<String> getScopes(){
+    public List<String> getScopes() {
         return scopes;
     }
-    
-    public UserProfile getUser(){
+
+    public UserProfile getUser() {
         return user;
     }
-    
+
     public String getKeyId() {
         return decodedJwt.getKeyId();
     }
-    
+
     public String getSubject() {
         return decodedJwt.getSubject();
     }
-    
+
     public String getAlgorithm() {
         return decodedJwt.getAlgorithm();
     }
-    
+
     public String getSignature() {
         return decodedJwt.getSignature();
     }
-    
+
     public List<String> getAudience() {
         return decodedJwt.getAudience();
     }
-    
-    public boolean checkTokenSignature() throws IllegalArgumentException, CertificateException, InvalidKeySpecException, NoSuchAlgorithmException, IOException {
+
+    public boolean checkTokenSignature() {
         try {
-            Algorithm algo = Algorithm.RSA256(BdrcJwks.getPublicKey(), null);
-            JWTVerifier verifier = JWT.require(algo)
-                    .withIssuer(BdrcJwks.getProp("issuer"))
-                    .withClaim(PublicClaims.NOT_BEFORE,Calendar.getInstance().getTime().getTime())
-                    .build(); 
-            decodedJwt = verifier.verify(token);
-            return (true && validateTokenKeyId());
-        }
-        catch(JWTVerificationException ex) {
-            ex.printStackTrace();
+            final long now = Calendar.getInstance().getTime().getTime();
+            final JWTVerifier verifier = BdrcJwks.verification.withClaim(PublicClaims.NOT_BEFORE, now).build();
+            decodedJwt = verifier.verify(tokenStr);
+            return true; // validateTokenKeyId(); I don't think the validateTokenId business matters
+        } catch (JWTVerificationException e) {
+            log.error("invalid token signature or outdated token");
             return false;
         }
     }
-    
-    public boolean validateTokenExpiration() {        
-        Calendar cal=Calendar.getInstance();        
-        return decodedJwt.getExpiresAt().after(cal.getTime());        
+
+    public boolean validateTokenExpiration() {
+        final Calendar cal = Calendar.getInstance();
+        return decodedJwt.getExpiresAt().after(cal.getTime());
     }
-    
-    public boolean validateTokenIssuer() {
-        return decodedJwt.getIssuer().equals("https://bdrc-io.auth0.com/");                
-    }
-        
+
     public boolean validateTokenKeyId() {
-        return decodedJwt.getKeyId().equals(BdrcJwks.getValue(BdrcJwks.KID));                
+        return decodedJwt.getKeyId().equals(BdrcJwks.getValue(PublicClaims.KEY_ID));
     }
-    
+
     public DecodedJWT getVerifiedJwt() {
         return decodedJwt;
     }
@@ -155,9 +126,7 @@ public class TokenValidation {
     @Override
     public String toString() {
         return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token="
-                + token + ", valid=" + valid + "]";
+                + tokenStr + ", valid=" + valid + "]";
     }
-    
-    
 
 }
