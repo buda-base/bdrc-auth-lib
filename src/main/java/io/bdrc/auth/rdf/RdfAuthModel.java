@@ -94,6 +94,7 @@ public class RdfAuthModel implements Runnable {
     }
 
     public static HashMap<String, User> getUsers() {
+
         if (users != null) {
             return users;
         }
@@ -102,12 +103,12 @@ public class RdfAuthModel implements Runnable {
         while (it.hasNext()) {
             final Resource rs = it.next();
             final User user = new User();
-            user.setAuthId(rs.getPropertyResourceValue(RdfConstants.AUTHID).toString());
+            user.setAuthId(rs.getProperty(RdfConstants.AUTHID).getObject().toString());
             user.setName(rs.getProperty(FOAF.name).getObject().toString());
             user.setEmail(rs.getProperty(FOAF.mbox).getObject().toString());
             user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject().toString());
-            final String id = rs.getURI();
-            user.setId(getShortName(id));
+            final String userId = rs.getURI();
+            user.setUserId(getShortName(userId));
             user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
             user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
             StmtIterator sit = rs.listProperties(RdfConstants.HAS_ROLE);
@@ -122,7 +123,7 @@ public class RdfAuthModel implements Runnable {
                 final String gp = st.getObject().toString();
                 user.getGroups().add(getShortName(gp));
             }
-            users.put(getShortName(id), user);
+            users.put(getShortName(userId), user);
         }
         return users;
     }

@@ -238,7 +238,6 @@ public class AuthDataModelBuilder {
         while (it.hasNext()) {
             roleList.add(getJsonValue(it.next(), "_id"));
         }
-        // System.out.println("user >> "+id+" Roles >> "+roleList);
         return roleList;
     }
 
