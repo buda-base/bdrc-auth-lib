@@ -17,7 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jena.version>3.8.0</jena.version>
+    <jena.version>3.9.0</jena.version>
   </properties>
   <developers>
         <developer>
@@ -47,7 +47,7 @@
     <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>auth0</artifactId>
-        <version>1.7.0</version>
+        <version>1.9.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
     <dependency>
