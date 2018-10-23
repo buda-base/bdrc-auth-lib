@@ -1,8 +1,5 @@
 package io.bdrc.auth;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -34,17 +31,8 @@ public class AuthProps {
 
     public final static Logger log = LoggerFactory.getLogger(AuthProps.class.getName());
 
-    public static void init(String propFile) {
-        try {
-            authProp=new Properties();
-            InputStream authInput = new FileInputStream(propFile);
-            authProp.load(authInput);
-            System.out.println("Props >>"+authProp.toString());
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public static void init(Properties props) {
+        authProp=props;
     }
 
     public static String getProperty(final String prop) {
