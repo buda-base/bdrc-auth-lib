@@ -67,4 +67,6 @@ public class RdfConstants {
     public static final String RESTRICTED_BY_TBRC = "AccessRestrictedByTbrc";
     public static final String FAIR_USE = "AccessFairUse";
 
+    public static final String CHINA = "China";
+
 }
