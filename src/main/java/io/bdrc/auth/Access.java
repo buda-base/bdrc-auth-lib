@@ -28,19 +28,16 @@ public class Access {
 
     final UserProfile user;
     final Endpoint endpoint;
-    String country;
 
-    public Access(final UserProfile user, final Endpoint endpoint, String country) {
+    public Access(final UserProfile user, final Endpoint endpoint) {
         super();
         this.user = user;
         this.endpoint = endpoint;
-        this.country = country;
     }
 
     public Access() {
         this.user = new UserProfile();
         this.endpoint = new Endpoint();
-        this.country="";
     }
 
     public boolean hasEndpointAccess() {
@@ -50,9 +47,6 @@ public class Access {
     public boolean hasResourceAccess(String accessType) {
         if(accessType.equals(RdfConstants.OPEN)) {
             return true;
-        }
-        if(accessType.equals(RdfConstants.RESTRICTED_CHINA) && country.equals(RdfConstants.CHINA)) {
-            return false;
         }
         return matchResourcePermissions(accessType);
     }
