@@ -74,8 +74,12 @@ public class RdfAuthModel implements Runnable {
     }
 
  // Reads authModel from fuseki and starts a ModelUpdate timer
-    public static void initForTest() {
-        updateAuthTestData(null);
+    public static void initForTest(boolean update) {
+        if(update) {
+            updateAuthTestData(null);
+        }else {
+            readAuthTestModel();
+        }
     }
 
     public static Long getUpdated() {
