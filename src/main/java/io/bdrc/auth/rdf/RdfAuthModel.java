@@ -76,9 +76,9 @@ public class RdfAuthModel implements Runnable {
  // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void initForTest(boolean update) {
         if(update) {
-            updateAuthTestData(null);
+            updateAuthData(null);
         }else {
-            readAuthTestModel();
+            readAuthModel();
         }
     }
 
@@ -347,17 +347,6 @@ public class RdfAuthModel implements Runnable {
         }
     }
 
-    public static void readAuthTestModel() {
-        String fusekiUrl = AuthProps.getProperty("fusekiUrl");
-        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        final Model m = access.getModel(AuthProps.getProperty("authDataTestGraph"));
-        if (m != null) {
-            resetModel(m);
-            update(System.currentTimeMillis());
-        }
-    }
-
     static void resetModel(final Model m) {
         authMod = m;
         getUsers();
@@ -385,24 +374,6 @@ public class RdfAuthModel implements Runnable {
         try {
             final AuthDataModelBuilder auth = new AuthDataModelBuilder(false);
             access.putModel(AuthProps.getProperty("authDataGraph"), auth.getModel());
-            resetModel(auth.getModel());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public static void updateAuthTestData(String fusekiUrl) {
-        if (fusekiUrl == null) {
-            fusekiUrl = AuthProps.getProperty("fusekiUrl");
-        }
-        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        log.info("Service fuseki >> " + fusekiUrl);
-        log.info("authDataTestGraph >> " + AuthProps.getProperty("authDataTestGraph"));
-        final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        try {
-            final AuthDataModelBuilder auth = new AuthDataModelBuilder(true);
-            access.putModel(AuthProps.getProperty("authDataTestGraph"), auth.getModel());
             resetModel(auth.getModel());
         } catch (IOException e) {
             // TODO Auto-generated catch block
