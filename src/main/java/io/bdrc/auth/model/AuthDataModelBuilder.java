@@ -116,6 +116,7 @@ public class AuthDataModelBuilder {
         String json_resp = baos.toString();
         baos.close();
         JsonNode node = mapper.readTree(json_resp);
+        System.out.println("NOD1 BUILDER >> "+node);
         String token = node.findValue("access_token").asText();
         model = ModelFactory.createDefaultModel();
         model.add(authMod);
@@ -179,6 +180,7 @@ public class AuthDataModelBuilder {
         }else {
             taskUrl=webTaskBaseUrl;
         }
+        System.out.println("TASK_URL >> "+taskUrl);
         groups = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
         final HttpGet get = new HttpGet(taskUrl + "groups");
@@ -187,6 +189,7 @@ public class AuthDataModelBuilder {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         resp.getEntity().writeTo(baos);
         final JsonNode node = mapper.readTree(baos.toString());
+        System.out.println("GROUPS NODE >> "+node);
         baos.close();
         final Iterator<JsonNode> it = node.at("/groups").elements();
         while (it.hasNext()) {
