@@ -73,7 +73,7 @@ public class BdrcJwks {
         }
     }
 
-    static String getValue(String key) {
+    public static String getValue(String key) {
         if (key.equals(X5C)) {
             return node.findValue(X5C).get(0).asText();
         }

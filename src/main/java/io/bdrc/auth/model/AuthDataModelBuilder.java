@@ -78,7 +78,7 @@ public class AuthDataModelBuilder {
     private boolean test;
 
     public AuthDataModelBuilder(boolean test) throws ClientProtocolException, IOException {
-        log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
+        log.info("URL >> " + AuthProps.getProperty("policiesUrl")+ " TEST ="+test);
         this.test=test;
         HttpURLConnection connection= null;
         InputStream stream = null;
