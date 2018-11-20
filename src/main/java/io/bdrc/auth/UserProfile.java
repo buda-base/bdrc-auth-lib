@@ -36,8 +36,10 @@ public class UserProfile {
     String name;
 
     public UserProfile(final DecodedJWT decodedJwt) {
+
         final String id = getId(decodedJwt);
         final User user = RdfAuthModel.getUser(id);
+
         if (user != null) {
             this.groups = RdfAuthModel.getUser(id).getGroups();
             this.roles = RdfAuthModel.getUser(id).getRoles();
@@ -75,6 +77,7 @@ public class UserProfile {
     }
 
     String getId(final DecodedJWT decodedJwt) {
+
         final Claim claim = decodedJwt.getClaims().get("sub");
         if (claim != null) {
             final String id = claim.asString();

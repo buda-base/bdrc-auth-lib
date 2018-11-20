@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Verification;
@@ -47,6 +48,7 @@ public class BdrcJwks {
     static RSAPublicKey publicKey;
     static Algorithm algo;
     static Verification verification;
+    static JWTVerifier verifier;
 
     public final static Logger log = LoggerFactory.getLogger(BdrcJwks.class.getName());
 
@@ -67,7 +69,9 @@ public class BdrcJwks {
             node = mapper.readTree(url);
             publicKey = buildPublicKey();
             algo = Algorithm.RSA256(publicKey, null);
-            verification = JWT.require(algo).withIssuer(AuthProps.getProperty("issuer"));
+            verifier=JWT.require(algo).build();
+            //verification = JWT.require(algo).withIssuer(AuthProps.getProperty("issuer"));
+
         } catch (IOException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             log.error("initialization error", e);
         }

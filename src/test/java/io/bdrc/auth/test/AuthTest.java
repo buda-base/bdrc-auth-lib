@@ -38,6 +38,7 @@ public class AuthTest {
     @BeforeClass
     public static void init() throws IOException {
         InputStream is=new FileInputStream("/etc/buda/iiifserv/iiifservTest.properties");
+        //InputStream is=new FileInputStream("/etc/buda/iiifserv/iiifserv.properties");
         Properties props=new Properties();
         props.load(is);
         AuthProps.init(props);
@@ -45,7 +46,10 @@ public class AuthTest {
         HttpClient client=HttpClientBuilder.create().build();
         HttpPost post=new HttpPost(AuthProps.getProperty("issuer")+"oauth/token");
         HashMap<String,String> json = new HashMap<>();
-        json.put("grant_type","client_credentials");
+        //json.put("grant_type","client_credentials");
+        json.put("grant_type","password");
+        json.put("username","admin@bdrc-test.com");
+        json.put("password","bdrc2018");
         json.put("client_id",AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret",AuthProps.getProperty("lds-pdiClientSecret"));
         json.put("audience",AuthProps.getProperty("audience"));
@@ -62,9 +66,7 @@ public class AuthTest {
         JsonNode node=mapper.readTree(json_resp);
         token=node.findValue("access_token").asText();
         //update model=false and test_case=true
-        RdfAuthModel.initForTest(true,true);
-        System.out.println("USERS >> "+RdfAuthModel.getUsers());
-        System.out.println("APPS >> "+RdfAuthModel.getApplications());
+        RdfAuthModel.initForTest(false,true);
     }
 
     @Test
@@ -81,7 +83,6 @@ public class AuthTest {
     public void ScopeTest() {
         TokenValidation tokVal=new TokenValidation(token);
         assert(tokVal.isValid());
-        assert(tokVal.isValidScope("read:resource_servers"));
     }
 
     @Test

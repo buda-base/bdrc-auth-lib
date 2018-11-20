@@ -45,8 +45,8 @@ public class TokenValidation {
     public TokenValidation(final String tokenStr) {
         this.tokenStr = tokenStr;
         try {
-            valid = checkTokenSignature() & validateTokenKeyId();
-            setScopes();
+            valid = checkTokenSignature()/* & validateTokenKeyId()*/;
+            //setScopes();
             user = new UserProfile(decodedJwt);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
@@ -100,9 +100,8 @@ public class TokenValidation {
 
     public boolean checkTokenSignature() {
         try {
-            final long now = Calendar.getInstance().getTime().getTime();
-            final JWTVerifier verifier = BdrcJwks.verification.withClaim(PublicClaims.NOT_BEFORE, now).build();
-            decodedJwt = verifier.verify(tokenStr);
+            final JWTVerifier verifier = BdrcJwks.verifier;
+            this.decodedJwt = verifier.verify(tokenStr);
             return true; // validateTokenKeyId(); I don't think the validateTokenId business matters
         } catch (JWTVerificationException e) {
             log.error("invalid token signature or outdated token");
@@ -128,5 +127,4 @@ public class TokenValidation {
         return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token="
                 + tokenStr + ", valid=" + valid + "]";
     }
-
 }
