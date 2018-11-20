@@ -38,7 +38,6 @@ public class AuthTest {
     @BeforeClass
     public static void init() throws IOException {
         InputStream is=new FileInputStream("/etc/buda/iiifserv/iiifservTest.properties");
-        //InputStream is=new FileInputStream("/etc/buda/iiifserv/iiifserv.properties");
         Properties props=new Properties();
         props.load(is);
         AuthProps.init(props);
@@ -66,7 +65,7 @@ public class AuthTest {
         JsonNode node=mapper.readTree(json_resp);
         token=node.findValue("access_token").asText();
         //update model=false and test_case=true
-        RdfAuthModel.initForTest(false,true);
+        RdfAuthModel.initForTest(true,true);
     }
 
     @Test
@@ -76,7 +75,6 @@ public class AuthTest {
         assert(tokVal.isValid());
         assert(tokVal.checkTokenSignature());
         assert(tokVal.validateTokenExpiration());
-        assert(tokVal.validateTokenKeyId());
     }
 
     @Test

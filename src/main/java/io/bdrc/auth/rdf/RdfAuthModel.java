@@ -64,7 +64,6 @@ public class RdfAuthModel implements Runnable {
     private static final int PERIOD_MS = Integer.parseInt(AuthProps.getProperty("updatePeriod"));
     private static final int DELAY_MS = 5000;
     public final static Logger log = LoggerFactory.getLogger(RdfAuthModel.class.getName());
-    static boolean test=false;
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void init() {
@@ -76,7 +75,6 @@ public class RdfAuthModel implements Runnable {
 
  // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void initForTest(boolean update,boolean isTest) {
-        test=isTest;
         if(update) {
             updateAuthData(null);
         }else {
@@ -374,7 +372,7 @@ public class RdfAuthModel implements Runnable {
         log.info("authDataGraph >> " + AuthProps.getProperty("authDataGraph"));
         final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         try {
-            final AuthDataModelBuilder auth = new AuthDataModelBuilder(test);
+            final AuthDataModelBuilder auth = new AuthDataModelBuilder();
             access.putModel(AuthProps.getProperty("authDataGraph"), auth.getModel());
             resetModel(auth.getModel());
         } catch (IOException e) {

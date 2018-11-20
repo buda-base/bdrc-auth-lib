@@ -1,7 +1,6 @@
 package io.bdrc.auth.model;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -70,37 +69,19 @@ public class AuthDataModelBuilder {
 
     public final static Logger log = LoggerFactory.getLogger(AuthDataModelBuilder.class.getName());
 
-    public static final String webTaskBaseUrl = "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/";
-    public static final String auth0BaseUrl = "https://bdrc-io.auth0.com/";
-    public static final String webTaskTestBaseUrl = "https://dev-bdrc.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/";
-    public static final String auth0TestBaseUrl = "https://dev-bdrc.auth0.com/";
+    public static final String webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
+    public static final String auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
 
-    private boolean test;
-
-    public AuthDataModelBuilder(boolean test) throws ClientProtocolException, IOException {
-        log.info("URL >> " + AuthProps.getProperty("policiesUrl")+ " TEST ="+test);
-        this.test=test;
-        HttpURLConnection connection= null;
-        InputStream stream = null;
-        if(!test) {
-            connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl"))
-                .openConnection();
-            stream = connection.getInputStream();
-        }else {
-            stream = new FileInputStream(AuthProps.getProperty("policiesUrl"));
-        }
+    public AuthDataModelBuilder() throws ClientProtocolException, IOException {
+        log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
+        HttpURLConnection connection= (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl")).openConnection();
+        InputStream  stream = connection.getInputStream();
         final Model authMod = ModelFactory.createDefaultModel();
         authMod.read(stream, "", "TURTLE");
         stream.close();
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post=null;
-        String baseUrl=null;
-        if(test) {
-            baseUrl=auth0TestBaseUrl;
-        }else {
-            baseUrl=auth0BaseUrl;
-        }
-        post = new HttpPost(baseUrl + "oauth/token");
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
@@ -127,12 +108,12 @@ public class AuthDataModelBuilder {
         setResourceAccess(authMod);
         // Apps require a call with a different audience
         client = HttpClientBuilder.create().build();
-        post = new HttpPost(baseUrl + "oauth/token");
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
         json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience", baseUrl + "api/v2/");
+        json.put("audience", auth0BaseUrl + "api/v2/");
         post_data = mapper.writer().writeValueAsString(json);
         se = new StringEntity(post_data);
         se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
@@ -148,16 +129,10 @@ public class AuthDataModelBuilder {
     }
 
     private void setApps(final String token) throws ClientProtocolException, IOException {
-        String baseUrl=null;
-        if(test) {
-            baseUrl=auth0TestBaseUrl;
-        }else {
-            baseUrl=auth0BaseUrl;
-        }
         apps = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
         final HttpGet get = new HttpGet(
-                baseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
+                auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -173,15 +148,9 @@ public class AuthDataModelBuilder {
     }
 
     private void setGroups(final String token) throws ClientProtocolException, IOException {
-        String taskUrl=null;
-        if(test) {
-            taskUrl=webTaskTestBaseUrl;
-        }else {
-            taskUrl=webTaskBaseUrl;
-        }
         groups = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(taskUrl + "groups");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "groups");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -197,15 +166,10 @@ public class AuthDataModelBuilder {
     }
 
     private void setRoles(final String token) throws ClientProtocolException, IOException {
-        String taskUrl=null;
-        if(test) {
-            taskUrl=webTaskTestBaseUrl;
-        }else {
-            taskUrl=webTaskBaseUrl;
-        }
+
         roles = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(taskUrl + "roles");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "roles");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -221,15 +185,10 @@ public class AuthDataModelBuilder {
     }
 
     private void setPermissions(String token) throws ClientProtocolException, IOException {
-        String taskUrl=null;
-        if(test) {
-            taskUrl=webTaskTestBaseUrl;
-        }else {
-            taskUrl=webTaskBaseUrl;
-        }
+
         permissions = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(taskUrl + "permissions");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "permissions");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -245,15 +204,10 @@ public class AuthDataModelBuilder {
     }
 
     private void setUsers(String token) throws ClientProtocolException, IOException {
-        String taskUrl=null;
-        if(test) {
-            taskUrl=webTaskTestBaseUrl;
-        }else {
-            taskUrl=webTaskBaseUrl;
-        }
+
         users = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(taskUrl + "users");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "users");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -271,15 +225,10 @@ public class AuthDataModelBuilder {
     }
 
     private ArrayList<String> getUserRoles(String token, String id) throws ClientProtocolException, IOException {
-        String taskUrl=null;
-        if(test) {
-            taskUrl=webTaskTestBaseUrl;
-        }else {
-            taskUrl=webTaskBaseUrl;
-        }
+
         final ArrayList<String> roleList = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(taskUrl + "users/" + id + "/roles/calculate");
+        final HttpGet get = new HttpGet(webTaskBaseUrl + "users/" + id + "/roles/calculate");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

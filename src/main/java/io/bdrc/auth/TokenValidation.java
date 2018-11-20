@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -45,8 +44,8 @@ public class TokenValidation {
     public TokenValidation(final String tokenStr) {
         this.tokenStr = tokenStr;
         try {
-            valid = checkTokenSignature()/* & validateTokenKeyId()*/;
-            //setScopes();
+            valid = checkTokenSignature();
+            setScopes();
             user = new UserProfile(decodedJwt);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
@@ -102,7 +101,7 @@ public class TokenValidation {
         try {
             final JWTVerifier verifier = BdrcJwks.verifier;
             this.decodedJwt = verifier.verify(tokenStr);
-            return true; // validateTokenKeyId(); I don't think the validateTokenId business matters
+            return true;
         } catch (JWTVerificationException e) {
             log.error("invalid token signature or outdated token");
             return false;
@@ -112,10 +111,6 @@ public class TokenValidation {
     public boolean validateTokenExpiration() {
         final Calendar cal = Calendar.getInstance();
         return decodedJwt.getExpiresAt().after(cal.getTime());
-    }
-
-    public boolean validateTokenKeyId() {
-        return decodedJwt.getKeyId().equals(BdrcJwks.getValue(PublicClaims.KEY_ID));
     }
 
     public DecodedJWT getVerifiedJwt() {

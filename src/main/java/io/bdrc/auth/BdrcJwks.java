@@ -70,7 +70,6 @@ public class BdrcJwks {
             publicKey = buildPublicKey();
             algo = Algorithm.RSA256(publicKey, null);
             verifier=JWT.require(algo).build();
-            //verification = JWT.require(algo).withIssuer(AuthProps.getProperty("issuer"));
 
         } catch (IOException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             log.error("initialization error", e);
