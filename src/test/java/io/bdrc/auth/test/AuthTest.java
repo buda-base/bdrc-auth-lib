@@ -45,10 +45,9 @@ public class AuthTest {
         HttpClient client=HttpClientBuilder.create().build();
         HttpPost post=new HttpPost(AuthProps.getProperty("issuer")+"oauth/token");
         HashMap<String,String> json = new HashMap<>();
-        //json.put("grant_type","client_credentials");
         json.put("grant_type","password");
         json.put("username","admin@bdrc-test.com");
-        json.put("password","bdrc2018");
+        json.put("password",AuthProps.getProperty("admin@bdrc-test.com"));
         json.put("client_id",AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret",AuthProps.getProperty("lds-pdiClientSecret"));
         json.put("audience",AuthProps.getProperty("audience"));
@@ -65,7 +64,7 @@ public class AuthTest {
         JsonNode node=mapper.readTree(json_resp);
         token=node.findValue("access_token").asText();
         //update model=false and test_case=true
-        RdfAuthModel.initForTest(true,true);
+        RdfAuthModel.initForTest(false,true);
     }
 
     @Test

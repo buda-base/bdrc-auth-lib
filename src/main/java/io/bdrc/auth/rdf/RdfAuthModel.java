@@ -1,6 +1,7 @@
 package io.bdrc.auth.rdf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -8,6 +9,7 @@ import java.util.Timer;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -61,7 +63,7 @@ public class RdfAuthModel implements Runnable {
     static HashMap<String, ArrayList<String>> paths;
     static Long updated = null;
 
-    private static final int PERIOD_MS = Integer.parseInt(AuthProps.getProperty("updatePeriod"));
+    private static int PERIOD_MS;
     private static final int DELAY_MS = 5000;
     public final static Logger log = LoggerFactory.getLogger(RdfAuthModel.class.getName());
 
@@ -70,6 +72,7 @@ public class RdfAuthModel implements Runnable {
         readAuthModel();
         final ModelUpdate task = new ModelUpdate();
         final Timer timer = new Timer();
+        PERIOD_MS = Integer.parseInt(AuthProps.getProperty("updatePeriod"));
         timer.schedule(task, DELAY_MS, PERIOD_MS);
     }
 
@@ -80,6 +83,13 @@ public class RdfAuthModel implements Runnable {
         }else {
             readAuthModel();
         }
+    }
+
+    public static void initForStaticTests() {
+        InputStream stream=Application.class.getClassLoader().getResourceAsStream("rdfAuthTestModel.ttl");
+        final Model m = ModelFactory.createDefaultModel();
+        m.read(stream, "", "TURTLE");
+        resetModel(m);
     }
 
     public static Long getUpdated() {
