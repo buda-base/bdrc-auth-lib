@@ -2,6 +2,7 @@ package io.bdrc.auth;
 
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.ResourceAccess;
+import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.auth.rdf.RdfConstants;
 
@@ -94,6 +95,10 @@ public class Access {
             }
         }
         return false;
+    }
+
+    public User getUser() {
+        return user.getUser();
     }
 
     @Override

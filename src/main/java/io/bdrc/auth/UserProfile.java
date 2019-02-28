@@ -34,11 +34,12 @@ public class UserProfile {
     ArrayList<String> roles;
     ArrayList<String> permissions;
     String name;
+    final User user;
 
     public UserProfile(final DecodedJWT decodedJwt) {
 
         final String id = getId(decodedJwt);
-        final User user = RdfAuthModel.getUser(id);
+        user = RdfAuthModel.getUser(id);
 
         if (user != null) {
             this.groups = RdfAuthModel.getUser(id).getGroups();
@@ -58,6 +59,7 @@ public class UserProfile {
         this.roles = new ArrayList<>();
         this.permissions = new ArrayList<>();
         this.name = "";
+        this.user=new User();
     }
 
     public ArrayList<String> getGroups() {
@@ -104,6 +106,9 @@ public class UserProfile {
         return permissions.contains(permission);
     }
 
+    public User getUser() {
+        return user;
+    }
     @Override
     public String toString() {
         return "User [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";
