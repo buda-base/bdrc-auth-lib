@@ -40,6 +40,8 @@ public class AuthProps {
     }
 
     public static String getProperty(final String prop) {
+        if (authProps == null)
+            return null;
         return authProps.getProperty(prop);
     }
 
