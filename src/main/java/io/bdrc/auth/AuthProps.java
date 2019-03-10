@@ -27,16 +27,20 @@ import org.slf4j.LoggerFactory;
 
 public class AuthProps {
 
-    static Properties authProp;
+    static Properties authProps = null;
 
     public final static Logger log = LoggerFactory.getLogger(AuthProps.class.getName());
 
     public static void init(Properties props) {
-        authProp=props;
+        authProps = props;
+    }
+
+    public static boolean hasProps() {
+        return authProps != null;
     }
 
     public static String getProperty(final String prop) {
-        return authProp.getProperty(prop);
+        return authProps.getProperty(prop);
     }
 
 }
