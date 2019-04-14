@@ -494,12 +494,12 @@
                 <p>Once the request is validated against BDRC auth policies, there is still the possibility of having the accessed endpoint (wether it is secured or not) delivering resources whose access types are limited.
 Therefore, we have a second security level inside the service offered by a given endpoint.</p>
 <p>Here, we will have to check BDRC policies to determine if the user profile is compliant or not with the requested resource access type.</p>
-<h5 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link"></a></h5>
+<h4 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link"></a></h4>
 <p>A basic usage of this auth feature consist of calling the <a href="https://github.com/buda-base/bdrc-auth-lib/blob/master/src/main/java/io/bdrc/auth/Access.java#L48">hasResourceAcess(String accessType)</a> of the Access object made available in the request context by the Auth filter.</p>
-<h5 id="extended-usage">Extended usage<a class="headerlink" href="#extended-usage" title="Permanent link"></a></h5>
-<p>BDRC auth library feature can also be associated to other security mechanism, not depending upon user profile. For instance BDRC also restricts access to some resources on the basis of the geo location of the requester.</p>
-<p>This kind of implementation uses a "Wrapper" that extend the basic "Access" object provided by the BDRC Auth library, by adding to it geo location services.</p>
-<p>A good example of such a Wrapper can be found here: <a href="https://github.com/buda-base/buda-iiif-server/blob/master/src/main/java/de/digitalcollections/iiif/myhymir/ResourceAccessValidation.java">ResourceAccessValidation</a></p>
+<h4 id="extended-usage">Extended usage<a class="headerlink" href="#extended-usage" title="Permanent link"></a></h4>
+<p>BDRC auth library feature can also be associated with other security mechanisms, not depending upon user profile. For instance, BDRC restricts access to some resources on the basis of the geo location of the requester.</p>
+<p>This kind of implementation uses a "wrapper" that extend the basic "Access" object provided by the BDRC Auth library, by adding to it geo location services.</p>
+<p>A good example of such a "wrapper" can be found here: <a href="https://github.com/buda-base/buda-iiif-server/blob/master/src/main/java/de/digitalcollections/iiif/myhymir/ResourceAccessValidation.java">ResourceAccessValidation</a></p>
 <p>where the geo location based access restriction is implemented as follows:</p>
 <blockquote>
 <p>public boolean isAccessible(HttpServletRequest request) {</p>
