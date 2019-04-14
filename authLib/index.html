@@ -98,6 +98,10 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
+      <a href="#bdrc-auth-library-main-fonctionalities" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -340,9 +344,43 @@
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        BDRC Auth lib
+      </label>
+    
     <a href="./" title="BDRC Auth lib" class="md-nav__link md-nav__link--active">
       BDRC Auth lib
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bdrc-auth-library-main-fonctionalities" title="BDRC Auth library main fonctionalities" class="md-nav__link">
+    BDRC Auth library main fonctionalities
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auth-model-update" title="Auth Model update" class="md-nav__link">
+    Auth Model update
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -377,20 +415,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../modes/" title="Security modes" class="md-nav__link">
-      Security modes
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../endpoint/" title="Endpoint access control" class="md-nav__link">
-      Endpoint access control
+    <a href="../modes/" title="Auth request Filters" class="md-nav__link">
+      Auth request Filters
     </a>
   </li>
 
@@ -419,6 +445,42 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bdrc-auth-library-main-fonctionalities" title="BDRC Auth library main fonctionalities" class="md-nav__link">
+    BDRC Auth library main fonctionalities
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auth-model-update" title="Auth Model update" class="md-nav__link">
+    Auth Model update
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
@@ -429,7 +491,36 @@
                 
                   <h1>BDRC Auth lib</h1>
                 
-                
+                <h4 id="bdrc-auth-library-main-fonctionalities">BDRC Auth library main fonctionalities<a class="headerlink" href="#bdrc-auth-library-main-fonctionalities" title="Permanent link"></a></h4>
+<ul>
+<li>
+<p>Builts the RDF auth data model from auth0 and github and updates it in fuseki . The auth data model is all contained in a single named graph ( <strong>http://purl.bdrc.io/ontology/ext/authData</strong> )</p>
+</li>
+<li>
+<p>Updates the ontology on fuseki whenever it changes through a github Webhook whose callback Url is <em>http://purl.bdrc.io/callbacks/github/owl-schema</em> endpoint on ldspdi. The Auth Ontology is a named graph ( <strong>http://purl.bdrc.io/ontology/ext/authSchema</strong> )</p>
+</li>
+<li>
+<p>Keeps available and maintains an up to date RdfAuthModel java object that can be used for validating or denying the access to secured endpoints or resources. This validation mechanism is explained in the "<a href="/modes/">Using BDRC auth lib</a>" section of this site.</p>
+</li>
+</ul>
+<h4 id="auth-model-update">Auth Model update<a class="headerlink" href="#auth-model-update" title="Permanent link"></a></h4>
+<p>BDRC-auth library is used on various servers of the BUDA platform and each instance of it has therefore its own local RdfAuthModel object. In order to ensure the accuracy of the Auth models across all BUDA secured services, we need to synchronize these local models each time the data is modified either in Auth0 platform or BDRC policies.</p>
+<p>Since BDRC Linked data server (ldspdi) is providing all webhooks callback Urls, it is therefore in charge of building the most recent model and publishing it to fuseki. Subsequently, all models of all instances of bdrc-auth-lib must be updated. This is accomplished by each instances through a “cron job” implemented in <a href="https://github.com/buda-base/bdrc-auth-lib/blob/master/src/main/java/io/bdrc/auth/rdf/ModelUpdate.java">io.bdrc.auth.rdf.ModelUpdate</a>. The whole operation goes as follows:</p>
+<ul>
+<li>
+<p>1) A change occurs in Auth0 <strong>or</strong> in Owl-schema (ontology) <strong>or</strong> in bdrc-auth (bdrc auth policies data)</p>
+</li>
+<li>
+<p>2) BDRC Linked Data server (ldspdi) is called by the relevant webhook then  rebuilds the model, saves the UPDATED time and reloads the new data on Fuseki.</p>
+</li>
+<li>
+<p>3) A cron job running on each instance of Bdrc-auth-lib asks ldspdi every five minutes (this period is configurable) for the UPDATED time at ( <a href="http://purl.bdrc.io/authmodel/updated">http://purl.bdrc.io/authmodel/updated</a>)  </p>
+</li>
+<li>
+<p>4) If <strong>ldspdi UPDATED time</strong> is more recent than the <strong>local UPDATED time</strong>, the local bdrc-auth-lib reloads the model from ldspdi at ( <a href="http://purl.bdrc.io/authmodel">http://purl.bdrc.io/authmodel</a> ) and updates its local UPDATED time.</p>
+</li>
+</ul>
+<p><strong>Note:</strong> this is not a real time update. A real time update could be done by implementing webhooks (triggerred by ldspdi) on each server instantiating bdrc-auth-lib. However, there is no valid point at that time that suggest such a real-time update implementation.</p>
                 
                   
                 
@@ -465,13 +556,13 @@
           </a>
         
         
-          <a href="../modes/" title="Security modes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../modes/" title="Auth request Filters" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Security modes
+                Auth request Filters
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
