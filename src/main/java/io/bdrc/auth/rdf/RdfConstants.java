@@ -57,6 +57,8 @@ public class RdfConstants {
     public final static Property CONNECTION = ResourceFactory.createProperty(AUTH_VOC_BASE + "connection");
     public final static Property POLICY = ResourceFactory.createProperty(AUTH_VOC_BASE + "policy");
     public final static String POLICY_URI = AUTH_VOC_BASE + "policy";
+    public final static Property PERSONAL_ACCESS = ResourceFactory.createProperty(AUTH_VOC_BASE + "personalAccess");
+    public final static String PERSONAL_ACCESS_URI = AUTH_VOC_BASE + "personalAccess";
 
     public static final String RESTRICTED_SEALED = "AccessRestrictedSealed";
     public static final String RESTRICTED_CHINA = "AccessRestrictedInChina";

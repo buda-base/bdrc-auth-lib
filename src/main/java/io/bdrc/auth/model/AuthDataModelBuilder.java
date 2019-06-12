@@ -63,6 +63,7 @@ public class AuthDataModelBuilder {
     ArrayList<ResourceAccess> access;
     ArrayList<Application> apps;
     ArrayList<String> paths;
+    HashMap<String, ArrayList<String>> personalAccess;
     Model model;
 
     static final ObjectMapper mapper = new ObjectMapper();
@@ -74,13 +75,13 @@ public class AuthDataModelBuilder {
 
     public AuthDataModelBuilder() throws ClientProtocolException, IOException {
         log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
-        HttpURLConnection connection= (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl")).openConnection();
-        InputStream  stream = connection.getInputStream();
+        HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl")).openConnection();
+        InputStream stream = connection.getInputStream();
         final Model authMod = ModelFactory.createDefaultModel();
         authMod.read(stream, "", "TURTLE");
         stream.close();
         HttpClient client = HttpClientBuilder.create().build();
-        HttpPost post=null;
+        HttpPost post = null;
         post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
         json.put("grant_type", "client_credentials");
@@ -106,6 +107,7 @@ public class AuthDataModelBuilder {
         setUsers(token);
         setEndpoints(authMod);
         setResourceAccess(authMod);
+        setPersonalAccess(authMod);
         // Apps require a call with a different audience
         client = HttpClientBuilder.create().build();
         post = new HttpPost(auth0BaseUrl + "oauth/token");
@@ -131,8 +133,7 @@ public class AuthDataModelBuilder {
     private void setApps(final String token) throws ClientProtocolException, IOException {
         apps = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
-        final HttpGet get = new HttpGet(
-                auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
+        final HttpGet get = new HttpGet(auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -266,6 +267,24 @@ public class AuthDataModelBuilder {
         }
     }
 
+    private void setPersonalAccess(Model authMod) throws ClientProtocolException, IOException {
+        personalAccess = new HashMap<>();
+        final Triple t = new Triple(Node.ANY, RdfConstants.PERSONAL_ACCESS.asNode(), Node.ANY);
+        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
+        while (ext.hasNext()) {
+            Triple pa = ext.next();
+            final String st = pa.getSubject().getURI();
+            final String res = pa.getObject().getURI();
+            ArrayList<String> tmp = personalAccess.get(st);
+            if (tmp == null) {
+                tmp = new ArrayList<>();
+            }
+            tmp.add(res);
+            personalAccess.put(st, tmp);
+        }
+        System.out.println("PERSONAL ACCESS" + personalAccess);
+    }
+
     public Model getModel() {
         return model;
     }
@@ -280,9 +299,7 @@ public class AuthDataModelBuilder {
 
     @Override
     public String toString() {
-        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions
-                + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths="
-                + paths + ", model=" + model + "]";
+        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths=" + paths + ", model=" + model + "]";
     }
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.Timer;
 
 import org.apache.jena.query.DatasetAccessor;
@@ -56,6 +57,7 @@ public class RdfAuthModel implements Runnable {
     static HashMap<String, User> users;
     static HashMap<String, Group> groups;
     static HashMap<String, Role> roles;
+    static HashMap<String, ArrayList<String>> personalAccess;
     static ArrayList<Permission> permissions;
     static ArrayList<Endpoint> endpoints;
     static ArrayList<ResourceAccess> access;
@@ -76,17 +78,17 @@ public class RdfAuthModel implements Runnable {
         timer.schedule(task, DELAY_MS, PERIOD_MS);
     }
 
- // Reads authModel from fuseki and starts a ModelUpdate timer
-    public static void initForTest(boolean update,boolean isTest) {
-        if(update) {
+    // Reads authModel from fuseki and starts a ModelUpdate timer
+    public static void initForTest(boolean update, boolean isTest) {
+        if (update) {
             updateAuthData(null);
-        }else {
+        } else {
             readAuthModel();
         }
     }
 
     public static void initForStaticTests() {
-        InputStream stream=Application.class.getClassLoader().getResourceAsStream("rdfAuthTestModel.ttl");
+        InputStream stream = Application.class.getClassLoader().getResourceAsStream("rdfAuthTestModel.ttl");
         final Model m = ModelFactory.createDefaultModel();
         m.read(stream, "", "TURTLE");
         resetModel(m);
@@ -296,6 +298,35 @@ public class RdfAuthModel implements Runnable {
         return access;
     }
 
+    public static HashMap<String, ArrayList<String>> getPersonalAccess() {
+        if (personalAccess != null) {
+            return personalAccess;
+        }
+        personalAccess = new HashMap<>();
+        //
+        final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.PERSONAL_ACCESS);
+        while (it.hasNext()) {
+            final Resource rs = it.next();
+            String user = rs.getURI();
+            String res = rs.getProperty(RdfConstants.PERSONAL_ACCESS).getObject().asResource().getURI();
+            ArrayList<String> access = personalAccess.get(user);
+            if (access == null) {
+                access = new ArrayList<>();
+            }
+            access.add(res);
+            personalAccess.put(user, access);
+        }
+        System.out.println("PP ACC " + personalAccess);
+        return personalAccess;
+    }
+
+    public static ArrayList<String> getPersonalAccess(String userUri) {
+        if (personalAccess != null) {
+            return personalAccess.get(userUri);
+        }
+        return null;
+    }
+
     public static ArrayList<Application> getApplications() {
         if (applications != null) {
             return applications;
@@ -366,6 +397,7 @@ public class RdfAuthModel implements Runnable {
         getEndpoints();
         getApplications();
         getResourceAccess();
+        getPersonalAccess();
         update(System.currentTimeMillis());
     }
 
@@ -403,6 +435,20 @@ public class RdfAuthModel implements Runnable {
             log.error("Running error", e);
         }
         log.info("Done loading and updating rdfAuth Model");
+    }
+
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        props.setProperty("fusekiUrl", "http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
+        props.setProperty("policiesUrl", "https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl");
+        props.setProperty("lds-pdiClientID", "WQ1WD5fRtieraybXqT9zNU342YXBIwsS");
+        props.setProperty("lds-pdiClientSecret", "4EQjpVk30O6t2XD0HYepHt0oNwObyVD2uTHy4Ipg1dKASOAEIBnY7FcE8PnQxOaL");
+        props.setProperty("auth0BaseUrl", "https://bdrc-io.auth0.com/");
+        props.setProperty("webTaskBaseUrl", "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/");
+        props.setProperty("authDataGraph", "http://purl.bdrc.io/ontology/ext/authData");
+        AuthProps.init(props);
+        Thread t = new Thread(new RdfAuthModel());
+        t.start();
     }
 
 }

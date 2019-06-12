@@ -44,6 +44,7 @@ public class User {
     String provider;
     String connection;
     ArrayList<String> roles;
+    ArrayList<String> personalAccess;
     ArrayList<String> groups;
     Model model;
 
@@ -73,6 +74,7 @@ public class User {
         connection = "";
         roles = new ArrayList<>();
         groups = new ArrayList<>();
+        personalAccess = new ArrayList<>();
         model = null;
     }
 
@@ -170,9 +172,8 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial="
-                + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles=" + roles + ", groups="
-                + groups + ", model=" + model + "]";
+        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles=" + roles + ", groups=" + groups + ", model="
+                + model + "]";
     }
 
 }
