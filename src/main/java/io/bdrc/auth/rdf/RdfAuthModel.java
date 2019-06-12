@@ -442,7 +442,7 @@ public class RdfAuthModel implements Runnable {
         props.setProperty("fusekiUrl", "http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
         props.setProperty("policiesUrl", "https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl");
         props.setProperty("lds-pdiClientID", "WQ1WD5fRtieraybXqT9zNU342YXBIwsS");
-        props.setProperty("lds-pdiClientSecret", "4EQjpVk30O6t2XD0HYepHt0oNwObyVD2uTHy4Ipg1dKASOAEIBnY7FcE8PnQxOaL");
+        props.setProperty("lds-pdiClientSecret", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         props.setProperty("auth0BaseUrl", "https://bdrc-io.auth0.com/");
         props.setProperty("webTaskBaseUrl", "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/");
         props.setProperty("authDataGraph", "http://purl.bdrc.io/ontology/ext/authData");
