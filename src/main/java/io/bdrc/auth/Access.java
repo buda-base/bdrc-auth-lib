@@ -59,8 +59,11 @@ public class Access {
         NOACCESS
       };
 
-    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, boolean restrictedInChina, final String resourceUri) {
+    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final boolean restrictedInChina, final String resourceUri) {
         if (restrictedInChina && isUserInChina()) {
+            return AccessLevel.NOACCESS;
+        }
+        if (!canUserAccessStatus(resourceStatusLocalName)) {
             return AccessLevel.NOACCESS;
         }
         if(resourceAccessLocalName.equals(RdfConstants.OPEN)) {
@@ -85,6 +88,10 @@ public class Access {
         return AccessLevel.NOACCESS;
     }
     
+    public boolean canUserAccessStatus(final String resourceStatusLocalName) {
+        return true;
+    }
+
     public boolean isUserInChina() {
         return false;
     }
