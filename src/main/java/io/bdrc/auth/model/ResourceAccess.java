@@ -30,55 +30,47 @@ import io.bdrc.auth.rdf.RdfConstants;
 
 public class ResourceAccess {
 
-    String policy;
-    String permission;
+    String policy = "";
+    String permission = "";
 
     public ResourceAccess(final Model model, final String resourceId) {
         final Triple t = new Triple(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
         final ExtendedIterator<Triple> ext = model.getGraph().find(t);
         while (ext.hasNext()) {
             final Triple tmp = ext.next();
-            final String value = tmp.getObject().toString().replaceAll("\"", "");
             final String prop = tmp.getPredicate().getURI();
             switch (prop) {
             case RdfConstants.FOR_PERM_URI:
-                permission = getShortName(value);
+                permission = tmp.getObject().getLocalName();
                 break;
             case RdfConstants.POLICY_URI:
-                policy = getShortName(value);
+                policy = tmp.getObject().getLocalName();
                 break;
             }
         }
     }
 
-    public ResourceAccess() {
-        this.policy = "";
-        this.permission = "";
-    }
+    public ResourceAccess() {}
 
     public String getPolicy() {
         return policy;
     }
 
-    public void setPolicy(final String policy) {
-        this.policy = getShortName(policy);
+    public void setPolicy(final String policyLocalName) {
+        this.policy = policyLocalName;
     }
 
     public String getPermission() {
         return permission;
     }
 
-    public void setPermission(final String permission) {
-        this.permission = getShortName(permission);
+    public void setPermission(final String permissionLocalName) {
+        this.permission = permissionLocalName;
     }
 
     @Override
     public String toString() {
         return "ResourceAccess [policy=" + policy + ", permission=" + permission + "]";
-    }
-
-    public String getShortName(final String st) {
-        return st.substring(st.lastIndexOf("/") + 1);
     }
 
 }

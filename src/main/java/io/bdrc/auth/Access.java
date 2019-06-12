@@ -52,6 +52,33 @@ public class Access {
         return matchResourcePermissions(accessType);
     }
 
+    public static enum AccessLevel {
+        OPEN,
+        FAIR_USE,
+        MIXED,
+        NOACCESS
+      };
+
+    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, boolean restrictedInChina, final String resourceUri) {
+        if(resourceAccessLocalName.equals(RdfConstants.OPEN)) {
+            return AccessLevel.OPEN;
+        }
+        final ResourceAccess access = RdfAuthModel.getResourceAccess(resourceAccessLocalName);
+        if(access != null) {
+            final String accessPermission = access.getPermission();
+            if (user.getPermissions().contains(accessPermission)) {
+                return AccessLevel.OPEN;
+            }
+        }
+        if (resourceAccessLocalName.equals(RdfConstants.FAIR_USE)) {
+            return AccessLevel.FAIR_USE;
+        }
+        if (resourceAccessLocalName.equals(RdfConstants.MIXED)) {
+            return AccessLevel.MIXED;
+        }
+        return AccessLevel.NOACCESS;
+    }
+    
     public boolean matchGroup() {
         boolean match = false;
         for(String gp:user.getGroups()) {
@@ -82,11 +109,11 @@ public class Access {
         return match;
     }
 
-    public boolean matchResourcePermissions(final String accessType) {
-        if(accessType.equals(RdfConstants.OPEN)) {
+    public boolean matchResourcePermissions(final String accessTypeLocalName) {
+        if(accessTypeLocalName.equals(RdfConstants.OPEN)) {
             return true;
         }
-        final ResourceAccess access = RdfAuthModel.getResourceAccess(accessType);
+        final ResourceAccess access = RdfAuthModel.getResourceAccess(accessTypeLocalName);
         if(access != null) {
             for(final String pm: user.getPermissions()) {
                 if(access.getPermission().equals(pm)) {
@@ -98,7 +125,7 @@ public class Access {
     }
 
     public User getUser() {
-        return user.getUser();
+        return this.user.getUser();
     }
 
     @Override

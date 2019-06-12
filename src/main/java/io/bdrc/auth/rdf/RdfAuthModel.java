@@ -289,8 +289,8 @@ public class RdfAuthModel implements Runnable {
         while (it.hasNext()) {
             final ResourceAccess acc = new ResourceAccess();
             final Resource rs = it.next();
-            acc.setPermission(rs.getProperty(RdfConstants.FOR_PERM).getObject().toString());
-            acc.setPolicy(rs.getProperty(RdfConstants.POLICY).getObject().toString());
+            acc.setPermission(rs.getProperty(RdfConstants.FOR_PERM).getObject().asResource().getLocalName());
+            acc.setPolicy(rs.getProperty(RdfConstants.POLICY).getObject().asResource().getLocalName());
             access.add(acc);
         }
         return access;
