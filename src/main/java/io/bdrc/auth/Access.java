@@ -60,15 +60,21 @@ public class Access {
       };
 
     public AccessLevel hasResourceAccess(final String resourceAccessLocalName, boolean restrictedInChina, final String resourceUri) {
+        if (restrictedInChina && isUserInChina()) {
+            return AccessLevel.NOACCESS;
+        }
         if(resourceAccessLocalName.equals(RdfConstants.OPEN)) {
             return AccessLevel.OPEN;
         }
         final ResourceAccess access = RdfAuthModel.getResourceAccess(resourceAccessLocalName);
         if(access != null) {
             final String accessPermission = access.getPermission();
-            if (user.getPermissions().contains(accessPermission)) {
+            if (user.hasPermission(accessPermission)) {
                 return AccessLevel.OPEN;
             }
+        }
+        if (canUserAccessResource(resourceUri)) {
+            return AccessLevel.OPEN;
         }
         if (resourceAccessLocalName.equals(RdfConstants.FAIR_USE)) {
             return AccessLevel.FAIR_USE;
@@ -79,6 +85,14 @@ public class Access {
         return AccessLevel.NOACCESS;
     }
     
+    public boolean isUserInChina() {
+        return false;
+    }
+
+    public boolean canUserAccessResource(final String resourceUri) {
+        return false;
+    }
+
     public boolean matchGroup() {
         boolean match = false;
         for(String gp:user.getGroups()) {
