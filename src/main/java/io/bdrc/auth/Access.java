@@ -59,10 +59,7 @@ public class Access {
         NOACCESS
       };
 
-    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final boolean restrictedInChina, final String resourceUri) {
-        if (restrictedInChina && isUserInChina()) {
-            return AccessLevel.NOACCESS;
-        }
+    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
         if (!canUserAccessStatus(resourceStatusLocalName)) {
             return AccessLevel.NOACCESS;
         }
@@ -90,10 +87,6 @@ public class Access {
     
     public boolean canUserAccessStatus(final String resourceStatusLocalName) {
         return true;
-    }
-
-    public boolean isUserInChina() {
-        return false;
     }
 
     public boolean canUserAccessResource(final String resourceUri) {
