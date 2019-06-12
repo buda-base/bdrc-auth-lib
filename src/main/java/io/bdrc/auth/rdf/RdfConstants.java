@@ -59,6 +59,8 @@ public class RdfConstants {
     public final static String POLICY_URI = AUTH_VOC_BASE + "policy";
     public final static Property PERSONAL_ACCESS = ResourceFactory.createProperty(AUTH_VOC_BASE + "personalAccess");
     public final static String PERSONAL_ACCESS_URI = AUTH_VOC_BASE + "personalAccess";
+    public final static Property ANY_STATUS = ResourceFactory.createProperty(AUTH_VOC_BASE + "forAnyStatus");
+    public final static String ANY_STATUS_URI = AUTH_VOC_BASE + "forAnyStatus";
 
     public static final String RESTRICTED_SEALED = "AccessRestrictedSealed";
     public static final String RESTRICTED_CHINA = "AccessRestrictedInChina";
@@ -68,5 +70,7 @@ public class RdfConstants {
     public static final String MIXED = "AccessMixed";
     public static final String RESTRICTED_BY_TBRC = "AccessRestrictedByTbrc";
     public static final String FAIR_USE = "AccessFairUse";
+
+    public static final String STATUS_RELEASED = "StatusReleased";
 
 }

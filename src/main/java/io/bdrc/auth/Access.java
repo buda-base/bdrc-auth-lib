@@ -89,7 +89,17 @@ public class Access {
     }
 
     public boolean canUserAccessStatus(final String resourceStatusLocalName) {
-        return true;
+        if (resourceStatusLocalName.equals(RdfConstants.STATUS_RELEASED)) {
+            return true;
+        }
+        ArrayList<String> groups = user.getGroups();
+        ArrayList<String> anyStatusGroups = RdfAuthModel.getAnyStatusGroup();
+        for (String s : groups) {
+            if (anyStatusGroups.contains(RdfConstants.AUTH_RESOURCE_BASE + s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean canUserAccessResource(final String resourceUri) {

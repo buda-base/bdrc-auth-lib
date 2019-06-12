@@ -63,7 +63,6 @@ public class AuthDataModelBuilder {
     ArrayList<ResourceAccess> access;
     ArrayList<Application> apps;
     ArrayList<String> paths;
-    HashMap<String, ArrayList<String>> personalAccess;
     Model model;
 
     static final ObjectMapper mapper = new ObjectMapper();
@@ -107,7 +106,6 @@ public class AuthDataModelBuilder {
         setUsers(token);
         setEndpoints(authMod);
         setResourceAccess(authMod);
-        setPersonalAccess(authMod);
         // Apps require a call with a different audience
         client = HttpClientBuilder.create().build();
         post = new HttpPost(auth0BaseUrl + "oauth/token");
@@ -265,24 +263,6 @@ public class AuthDataModelBuilder {
             final ResourceAccess acc = new ResourceAccess(authMod, st);
             access.add(acc);
         }
-    }
-
-    private void setPersonalAccess(Model authMod) throws ClientProtocolException, IOException {
-        personalAccess = new HashMap<>();
-        final Triple t = new Triple(Node.ANY, RdfConstants.PERSONAL_ACCESS.asNode(), Node.ANY);
-        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
-        while (ext.hasNext()) {
-            Triple pa = ext.next();
-            final String st = pa.getSubject().getURI();
-            final String res = pa.getObject().getURI();
-            ArrayList<String> tmp = personalAccess.get(st);
-            if (tmp == null) {
-                tmp = new ArrayList<>();
-            }
-            tmp.add(res);
-            personalAccess.put(st, tmp);
-        }
-        System.out.println("PERSONAL ACCESS" + personalAccess);
     }
 
     public Model getModel() {

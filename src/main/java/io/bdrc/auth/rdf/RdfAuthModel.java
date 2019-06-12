@@ -58,6 +58,7 @@ public class RdfAuthModel implements Runnable {
     static HashMap<String, Group> groups;
     static HashMap<String, Role> roles;
     static HashMap<String, ArrayList<String>> personalAccess;
+    static ArrayList<String> anyStatusGroups;
     static ArrayList<Permission> permissions;
     static ArrayList<Endpoint> endpoints;
     static ArrayList<ResourceAccess> access;
@@ -316,8 +317,24 @@ public class RdfAuthModel implements Runnable {
             access.add(res);
             personalAccess.put(user, access);
         }
-        System.out.println("PP ACC " + personalAccess);
         return personalAccess;
+    }
+
+    public static ArrayList<String> getAnyStatusGroup() {
+        if (anyStatusGroups != null) {
+            return anyStatusGroups;
+        }
+        anyStatusGroups = new ArrayList<>();
+        final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.ANY_STATUS);
+        while (it.hasNext()) {
+            final Resource rs = it.next();
+            String group = rs.getURI();
+            boolean acc = rs.getProperty(RdfConstants.ANY_STATUS).getBoolean();
+            if (acc) {
+                anyStatusGroups.add(group);
+            }
+        }
+        return anyStatusGroups;
     }
 
     public static ArrayList<String> getPersonalAccess(String userUri) {
@@ -398,6 +415,7 @@ public class RdfAuthModel implements Runnable {
         getApplications();
         getResourceAccess();
         getPersonalAccess();
+        getAnyStatusGroup();
         update(System.currentTimeMillis());
     }
 
@@ -439,13 +457,7 @@ public class RdfAuthModel implements Runnable {
 
     public static void main(String[] args) {
         Properties props = new Properties();
-        props.setProperty("fusekiUrl", "http://buda1.bdrc.io:13180/fuseki/rfc011rw/query");
-        props.setProperty("policiesUrl", "https://raw.githubusercontent.com/buda-base/bdrc-auth-policies/master/policies.ttl");
-        props.setProperty("lds-pdiClientID", "WQ1WD5fRtieraybXqT9zNU342YXBIwsS");
-        props.setProperty("lds-pdiClientSecret", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-        props.setProperty("auth0BaseUrl", "https://bdrc-io.auth0.com/");
-        props.setProperty("webTaskBaseUrl", "https://bdrc-io.us.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/api/");
-        props.setProperty("authDataGraph", "http://purl.bdrc.io/ontology/ext/authData");
+
         AuthProps.init(props);
         Thread t = new Thread(new RdfAuthModel());
         t.start();
