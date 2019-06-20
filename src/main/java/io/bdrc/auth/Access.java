@@ -33,6 +33,10 @@ public class Access {
     final UserProfile user;
     final Endpoint endpoint;
 
+    public static enum AccessLevel {
+        OPEN, FAIR_USE, MIXED, NOACCESS
+    }
+
     public Access(final UserProfile user, final Endpoint endpoint) {
         super();
         this.user = user;
@@ -55,9 +59,9 @@ public class Access {
         return matchResourcePermissions(accessType);
     }
 
-    public static enum AccessLevel {
-        OPEN, FAIR_USE, MIXED, NOACCESS
-    };
+    public boolean isUserLoggedIn() {
+        return !getUser().getUserId().equals("");
+    }
 
     public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
         if (!canUserAccessStatus(resourceStatusLocalName)) {
