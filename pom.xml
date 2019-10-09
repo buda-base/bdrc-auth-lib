@@ -3,7 +3,7 @@
   <groupId>io.bdrc</groupId>
   <artifactId>bdrc-auth-lib</artifactId>
   <packaging>jar</packaging>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
   <name>bdrc-auth-lib</name>
   <description>BDRC authorization library based on auth0</description>
   <url>https://github.com/BuddhistDigitalResourceCenter/bdrc-auth-lib</url>

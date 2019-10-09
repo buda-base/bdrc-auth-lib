@@ -26,13 +26,13 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class RdfConstants {
 
-    public static final String AUTH_RESOURCE_BASE = "http://purl.bdrc.io/resource-auth/";
+    public static final String AUTH_RESOURCE_BASE = "http://purl.bdrc.io/resource-nc/auth/";
     public static final String AUTH_VOC_BASE = "http://purl.bdrc.io/ontology/ext/auth/";
     public static final Resource APPLICATION = ResourceFactory.createResource(AUTH_VOC_BASE + "Application");
     public static final Resource PERMISSION = ResourceFactory.createResource(AUTH_VOC_BASE + "Permission");
     public static final Resource ROLE = ResourceFactory.createResource(AUTH_VOC_BASE + "Role");
     public static final Resource GROUP = ResourceFactory.createResource(AUTH_VOC_BASE + "Group");
-    public static final Resource USER = ResourceFactory.createResource(AUTH_VOC_BASE + "User");
+    public static final Resource USER = ResourceFactory.createResource(AUTH_VOC_BASE + "UserProfile");
     public static final Resource ENDPOINT = ResourceFactory.createResource(AUTH_VOC_BASE + "Endpoint");
     public static final Resource RES_ACCESS = ResourceFactory.createResource(AUTH_VOC_BASE + "ResourceAccess");
 
