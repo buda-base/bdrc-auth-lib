@@ -53,7 +53,7 @@ public class Access {
     }
 
     public boolean hasResourceAccess(String accessType) {
-        if (accessType.equals(RdfConstants.OPEN)) {
+        if (RdfConstants.OPEN.equals(accessType)) {
             return true;
         }
         return matchResourcePermissions(accessType);
@@ -70,7 +70,7 @@ public class Access {
             }
             return AccessLevel.NOACCESS;
         }
-        if (resourceAccessLocalName.equals(RdfConstants.OPEN)) {
+        if (RdfConstants.OPEN.equals(resourceAccessLocalName)) {
             return AccessLevel.OPEN;
         }
         final ResourceAccess access = RdfAuthModel.getResourceAccess(resourceAccessLocalName);
@@ -83,17 +83,17 @@ public class Access {
         if (canUserAccessResource(resourceUri)) {
             return AccessLevel.OPEN;
         }
-        if (resourceAccessLocalName.equals(RdfConstants.FAIR_USE)) {
+        if (RdfConstants.FAIR_USE.equals(resourceAccessLocalName)) {
             return AccessLevel.FAIR_USE;
         }
-        if (resourceAccessLocalName.equals(RdfConstants.MIXED)) {
+        if (RdfConstants.MIXED.equals(resourceAccessLocalName)) {
             return AccessLevel.MIXED;
         }
         return AccessLevel.NOACCESS;
     }
 
     public boolean canUserAccessStatus(final String resourceStatusLocalName) {
-        if (resourceStatusLocalName.equals(RdfConstants.STATUS_RELEASED)) {
+        if (RdfConstants.STATUS_RELEASED.equals(resourceStatusLocalName)) {
             return true;
         }
         ArrayList<String> groups = user.getGroups();
@@ -145,7 +145,7 @@ public class Access {
     }
 
     public boolean matchResourcePermissions(final String accessTypeLocalName) {
-        if (accessTypeLocalName.equals(RdfConstants.OPEN)) {
+        if (RdfConstants.OPEN.equals(accessTypeLocalName)) {
             return true;
         }
         final ResourceAccess access = RdfAuthModel.getResourceAccess(accessTypeLocalName);
