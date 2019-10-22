@@ -43,6 +43,7 @@ public class User {
     String isSocial;
     String provider;
     String connection;
+    boolean blocked;
     ArrayList<String> roles;
     ArrayList<String> personalAccess;
     ArrayList<String> groups;
@@ -52,6 +53,16 @@ public class User {
         authId = getJsonValue(json, "user_id");
         name = getJsonValue(json, "name");
         email = getJsonValue(json, "email");
+        String blck = getJsonValue(json, "blocked");
+        if (!blck.equals("")) {
+            try {
+                blocked = Boolean.getBoolean(blck);
+            } catch (Exception e) {
+                // This should never happen as blocked (when set)
+                // is always a correct value provided by auth0
+                blocked = true;
+            }
+        }
         this.roles = roles;
         groups = new ArrayList<>();
         final JsonNode ids = json.findValue("identities");
@@ -72,6 +83,7 @@ public class User {
         userId = "";
         provider = "";
         connection = "";
+        blocked = false;
         roles = new ArrayList<>();
         groups = new ArrayList<>();
         personalAccess = new ArrayList<>();
@@ -170,10 +182,22 @@ public class User {
         return authId;
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public ArrayList<String> getPersonalAccess() {
+        return personalAccess;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", roles=" + roles + ", groups=" + groups + ", model="
-                + model + "]";
+        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", blocked=" + blocked + ", roles=" + roles
+                + ", personalAccess=" + personalAccess + ", groups=" + groups + ", model=" + model + "]";
     }
 
 }
