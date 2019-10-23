@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDF;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.auth.rdf.RdfConstants;
 
 /*******************************************************************************
@@ -112,6 +113,10 @@ public class User {
             return tmp.asText();
         }
         return "";
+    }
+
+    public boolean isAdmin() {
+        return groups.contains(RdfAuthModel.adminGroupId);
     }
 
     public void setUserId(String userId) {

@@ -65,6 +65,7 @@ public class RdfAuthModel implements Runnable {
     static ArrayList<Application> applications;
     static HashMap<String, ArrayList<String>> paths;
     static Long updated = null;
+    public static String adminGroupId;
 
     private static int PERIOD_MS;
     private static final int DELAY_MS = 5000;
@@ -172,6 +173,9 @@ public class RdfAuthModel implements Runnable {
             gp.setId(getShortName(rs.getURI()));
             gp.setName(rs.getProperty(RDFS.label).getObject().toString());
             gp.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
+            if (gp.getName().equals("admin")) {
+                adminGroupId = gp.getId();
+            }
             groups.put(getShortName(rs.getURI()), gp);
         }
         return groups;
