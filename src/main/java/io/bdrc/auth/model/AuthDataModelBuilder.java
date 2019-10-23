@@ -13,11 +13,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
@@ -267,6 +269,16 @@ public class AuthDataModelBuilder {
 
     public Model getModel() {
         return model;
+    }
+
+    public static String patchUser(String auth0Id, String jsonPayload) throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPatch patch = new HttpPatch(auth0BaseUrl + "api/v2/users/" + auth0Id);
+        StringEntity se = new StringEntity(jsonPayload);
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        patch.setEntity(se);
+        HttpResponse resp = client.execute(patch);
+        return EntityUtils.toString(resp.getEntity());
     }
 
     final String getJsonValue(final JsonNode json, final String key) {
