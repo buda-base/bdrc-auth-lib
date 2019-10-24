@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -271,14 +273,19 @@ public class AuthDataModelBuilder {
         return model;
     }
 
-    public static String patchUser(String auth0Id, String jsonPayload) throws ClientProtocolException, IOException {
+    public static String patchUser(String auth0Id, String jsonPayload, String token) throws ClientProtocolException, IOException, URISyntaxException {
         HttpClient client = HttpClientBuilder.create().build();
-        HttpPatch patch = new HttpPatch(auth0BaseUrl + "api/v2/users/" + auth0Id);
+        URI u = new URI(auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
+        HttpPatch patch = new HttpPatch(u);
+        patch.addHeader("Authorization", "Bearer " + token);
         StringEntity se = new StringEntity(jsonPayload);
         se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         patch.setEntity(se);
         HttpResponse resp = client.execute(patch);
-        return EntityUtils.toString(resp.getEntity());
+        log.info("patchUser response >> {}", resp);
+        String rp = EntityUtils.toString(resp.getEntity());
+        log.info("patchUser response content >> {}", rp);
+        return rp;
     }
 
     final String getJsonValue(final JsonNode json, final String key) {
