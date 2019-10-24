@@ -132,6 +132,28 @@ public class AuthDataModelBuilder {
         setApps(token);
     }
 
+    private static String getToken() throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = null;
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
+        HashMap<String, String> json = new HashMap<>();
+        json.put("grant_type", "client_credentials");
+        json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
+        json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
+        json.put("audience", auth0BaseUrl + "api/v2/");
+        String post_data = mapper.writer().writeValueAsString(json);
+        StringEntity se = new StringEntity(post_data);
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        post.setEntity(se);
+        HttpResponse response = client.execute(post);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        response.getEntity().writeTo(baos);
+        String json_resp = baos.toString();
+        baos.close();
+        JsonNode node = mapper.readTree(json_resp);
+        return node.findValue("access_token").asText();
+    }
+
     private void setApps(final String token) throws ClientProtocolException, IOException {
         apps = new ArrayList<>();
         final HttpClient client = HttpClientBuilder.create().build();
@@ -273,11 +295,12 @@ public class AuthDataModelBuilder {
         return model;
     }
 
-    public static String patchUser(String auth0Id, String jsonPayload, String token) throws ClientProtocolException, IOException, URISyntaxException {
+    public static String patchUser(String auth0Id, String jsonPayload) throws ClientProtocolException, IOException, URISyntaxException {
         HttpClient client = HttpClientBuilder.create().build();
         URI u = new URI(auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
         HttpPatch patch = new HttpPatch(u);
-        patch.addHeader("Authorization", "Bearer " + token);
+        // using getToken() : we need a special token to use auth0 api
+        patch.addHeader("Authorization", "Bearer " + getToken());
         StringEntity se = new StringEntity(jsonPayload);
         se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         patch.setEntity(se);
