@@ -52,10 +52,6 @@ public class Access {
         return matchGroup() || matchRole() || matchPermissions();
     }
 
-    public boolean hasEndpointAccess(String method) {
-        return matchGroup() || matchRole() || matchPermissions() || matchMethod(method);
-    }
-
     public boolean hasResourceAccess(String accessType) {
         if (RdfConstants.OPEN.equals(accessType)) {
             return true;
@@ -146,13 +142,6 @@ public class Access {
             }
         }
         return match;
-    }
-
-    public boolean matchMethod(String method) {
-        if (endpoint.getMethods().size() == 0 || method == null) {
-            return true;
-        }
-        return endpoint.getMethods().contains(method);
     }
 
     public boolean matchResourcePermissions(final String accessTypeLocalName) {

@@ -134,6 +134,10 @@ public class Endpoint {
         return st.substring(st.lastIndexOf("/") + 1);
     }
 
+    public boolean isSecured(String method) {
+        return getMethods().contains(method);
+    }
+
     @Override
     public String toString() {
         return "Endpoint [path=" + path + ", appId=" + appId + ", groups=" + groups + ", roles=" + roles + ", methods=" + methods + ", permissions="

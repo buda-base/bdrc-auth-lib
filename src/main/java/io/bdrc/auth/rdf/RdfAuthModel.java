@@ -273,6 +273,14 @@ public class RdfAuthModel implements Runnable {
             while (sit.hasNext()) {
                 endp.getPermissions().add(getShortName(sit.next().getObject().toString()));
             }
+            Statement ss = rs.getProperty(RdfConstants.FOR_METHOD);
+            if (ss != null) {
+                ArrayList<String> list = new ArrayList<>();
+                for (String s : rs.getProperty(RdfConstants.FOR_METHOD).getObject().toString().split(",")) {
+                    list.add(s);
+                }
+                endp.setMethods(list);
+            }
             endp.setPath(rs.getProperty(RdfConstants.PATH).getObject().toString());
             String appId = rs.getProperty(RdfConstants.APPID).getObject().asResource().getLocalName();
             endp.setAppId(appId);
