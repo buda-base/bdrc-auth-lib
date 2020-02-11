@@ -59,7 +59,7 @@ public class UserProfile {
         this.roles = new ArrayList<>();
         this.permissions = new ArrayList<>();
         this.name = "";
-        this.user=new User();
+        this.user = new User();
     }
 
     public ArrayList<String> getGroups() {
@@ -79,7 +79,6 @@ public class UserProfile {
     }
 
     String getId(final DecodedJWT decodedJwt) {
-
         final Claim claim = decodedJwt.getClaims().get("sub");
         if (claim != null) {
             final String id = claim.asString();
@@ -109,6 +108,7 @@ public class UserProfile {
     public User getUser() {
         return user;
     }
+
     @Override
     public String toString() {
         return "User [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";

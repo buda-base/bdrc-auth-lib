@@ -399,7 +399,7 @@ public class RdfAuthModel implements Runnable {
     // Loads the model from fuseki -
     // Used by any application using bdrc-auth-lib
     // The model will then be updated (by ModelUpdate timer)
-    // each when a new version has been created and published
+    // when a new version has been created and published
     // by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib repo
     public static void readAuthModel() {
         String fusekiUrl = AuthProps.getProperty("fusekiUrl");

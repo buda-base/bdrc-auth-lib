@@ -36,12 +36,14 @@ public class Endpoint {
     String appId;
     ArrayList<String> groups;
     ArrayList<String> roles;
+    ArrayList<String> methods;
     ArrayList<String> permissions;
 
     public Endpoint(final Model model, final String resourceId) {
         groups = new ArrayList<>();
         roles = new ArrayList<>();
         permissions = new ArrayList<>();
+        methods = new ArrayList<>();
         Triple t = new Triple(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
         ExtendedIterator<Triple> ext = model.getGraph().find(t);
         while (ext.hasNext()) {
@@ -58,6 +60,9 @@ public class Endpoint {
             case RdfConstants.FOR_ROLE_URI:
                 roles.add(getShortName(value));
                 break;
+            case RdfConstants.FOR_METHOD_URI:
+                methods.add(getShortName(value));
+                break;
             case RdfConstants.FOR_GROUP_URI:
                 groups.add(getShortName(value));
                 break;
@@ -72,6 +77,7 @@ public class Endpoint {
         groups = new ArrayList<>();
         roles = new ArrayList<>();
         permissions = new ArrayList<>();
+        methods = new ArrayList<>();
         appId = "";
         path = "";
     }
@@ -82,6 +88,10 @@ public class Endpoint {
 
     public void setAppId(final String app) {
         this.appId = app;
+    }
+
+    public void setMethods(ArrayList<String> methods) {
+        this.methods = methods;
     }
 
     public void setGroups(final ArrayList<String> groups) {
@@ -108,6 +118,10 @@ public class Endpoint {
         return groups;
     }
 
+    public ArrayList<String> getMethods() {
+        return methods;
+    }
+
     public ArrayList<String> getRoles() {
         return roles;
     }
@@ -122,8 +136,8 @@ public class Endpoint {
 
     @Override
     public String toString() {
-        return "Endpoint [path=" + path + ", appId=" + appId + ", groups=" + groups + ", roles=" + roles
-                + ", permissions=" + permissions + "]";
+        return "Endpoint [path=" + path + ", appId=" + appId + ", groups=" + groups + ", roles=" + roles + ", methods=" + methods + ", permissions="
+                + permissions + "]";
     }
 
 }

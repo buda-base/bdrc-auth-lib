@@ -44,6 +44,8 @@ public class RdfConstants {
     public final static String PATH_URI = AUTH_VOC_BASE + "path";
     public final static Property FOR_ROLE = ResourceFactory.createProperty(AUTH_VOC_BASE + "forRole");
     public final static String FOR_ROLE_URI = AUTH_VOC_BASE + "forRole";
+    public final static Property FOR_METHOD = ResourceFactory.createProperty(AUTH_VOC_BASE + "forMethod");
+    public final static String FOR_METHOD_URI = AUTH_VOC_BASE + "forMethod";
     public final static Property FOR_GROUP = ResourceFactory.createProperty(AUTH_VOC_BASE + "forGroup");
     public final static String FOR_GROUP_URI = AUTH_VOC_BASE + "forGroup";
     public final static Property FOR_PERM = ResourceFactory.createProperty(AUTH_VOC_BASE + "forPermission");

@@ -50,7 +50,8 @@ public class ResourceAccess {
         }
     }
 
-    public ResourceAccess() {}
+    public ResourceAccess() {
+    }
 
     public String getPolicy() {
         return policy;
