@@ -42,7 +42,7 @@ public class ModelUpdate extends TimerTask {
         if (lastLocalUpdate == null) {
             lastLocalUpdate = (long) 1;
         }
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(AuthProps.getProperty("authUpdatePath"));
         try {
             final HttpResponse resp = client.execute(get);

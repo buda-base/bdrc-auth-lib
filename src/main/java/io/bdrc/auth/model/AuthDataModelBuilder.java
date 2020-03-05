@@ -83,7 +83,7 @@ public class AuthDataModelBuilder {
         final Model authMod = ModelFactory.createDefaultModel();
         authMod.read(stream, "", "TURTLE");
         stream.close();
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
         post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
@@ -133,7 +133,7 @@ public class AuthDataModelBuilder {
     }
 
     private static String getToken() throws IOException {
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
         post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
@@ -156,7 +156,7 @@ public class AuthDataModelBuilder {
 
     private void setApps(final String token) throws ClientProtocolException, IOException {
         apps = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -174,7 +174,7 @@ public class AuthDataModelBuilder {
 
     private void setGroups(final String token) throws ClientProtocolException, IOException {
         groups = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "groups");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -193,7 +193,7 @@ public class AuthDataModelBuilder {
     private void setRoles(final String token) throws ClientProtocolException, IOException {
 
         roles = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "roles");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -212,7 +212,7 @@ public class AuthDataModelBuilder {
     private void setPermissions(String token) throws ClientProtocolException, IOException {
 
         permissions = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "permissions");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -231,7 +231,7 @@ public class AuthDataModelBuilder {
     private void setUsers(String token) throws ClientProtocolException, IOException {
 
         users = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "users");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -252,7 +252,7 @@ public class AuthDataModelBuilder {
     private ArrayList<String> getUserRoles(String token, String id) throws ClientProtocolException, IOException {
 
         final ArrayList<String> roleList = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "users/" + id + "/roles/calculate");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -296,7 +296,7 @@ public class AuthDataModelBuilder {
     }
 
     public static String patchUser(String auth0Id, String jsonPayload) throws ClientProtocolException, IOException, URISyntaxException {
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         URI u = new URI(auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
         HttpPatch patch = new HttpPatch(u);
         // using getToken() : we need a special token to use auth0 api
@@ -321,7 +321,8 @@ public class AuthDataModelBuilder {
 
     @Override
     public String toString() {
-        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths=" + paths + ", model=" + model + "]";
+        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", users=" + users + ", endpoints="
+                + endpoints + ", access=" + access + ", apps=" + apps + ", paths=" + paths + ", model=" + model + "]";
     }
 
 }

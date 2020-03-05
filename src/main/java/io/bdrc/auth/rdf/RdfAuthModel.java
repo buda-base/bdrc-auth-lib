@@ -1,11 +1,11 @@
 package io.bdrc.auth.rdf;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.Timer;
 
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
@@ -74,10 +74,6 @@ public class RdfAuthModel implements Runnable {
     // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void init() {
         readAuthModel();
-        final ModelUpdate task = new ModelUpdate();
-        final Timer timer = new Timer();
-        PERIOD_MS = Integer.parseInt(AuthProps.getProperty("updatePeriod"));
-        timer.schedule(task, DELAY_MS, PERIOD_MS);
     }
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
@@ -472,8 +468,21 @@ public class RdfAuthModel implements Runnable {
     }
 
     public static void main(String[] args) {
+        // Properties props = new Properties();
+        // InputStream input =
+        // Rdf.class.getClassLoader().getResourceAsStream("iiifpres.properties");
         Properties props = new Properties();
+        // props.load(input);
+        try {
+            InputStream is = new FileInputStream("/etc/buda/share/shared-private.properties");
+            props.load(is);
+            is = new FileInputStream("/etc/buda/iiifpres/iiifpres.properties");
+            props.load(is);
+            is.close();
 
+        } catch (Exception ex) {
+            // do nothing, continue props initialization
+        }
         AuthProps.init(props);
         Thread t = new Thread(new RdfAuthModel());
         t.start();
