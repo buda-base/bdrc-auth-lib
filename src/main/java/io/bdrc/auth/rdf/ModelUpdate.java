@@ -1,11 +1,13 @@
 package io.bdrc.auth.rdf;
 
-import java.io.ByteArrayOutputStream;
-import java.util.TimerTask;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,31 +34,37 @@ import io.bdrc.auth.AuthProps;
  * limitations under the License.
  ******************************************************************************/
 
-public class ModelUpdate extends TimerTask {
+public class ModelUpdate implements Runnable {
 
-    public final static Logger log = LoggerFactory.getLogger(TimerTask.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(ModelUpdate.class.getName());
+
+    public ModelUpdate() {
+        super();
+    }
 
     @Override
     public void run() {
-        Long lastLocalUpdate = RdfAuthModel.getUpdated();
-        if (lastLocalUpdate == null) {
-            lastLocalUpdate = (long) 1;
-        }
-        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
-        final HttpGet get = new HttpGet(AuthProps.getProperty("authUpdatePath"));
-        try {
-            final HttpResponse resp = client.execute(get);
-            if (resp.getStatusLine().getStatusCode() != 200) {
-                throw new Exception("Update failed: " + AuthProps.getProperty("authUpdatePath") + " is not available");
+        List<String> serviceUpdates = Arrays.asList(AuthProps.getProperty("serviceUpdates").split(","));
+        log.info("Auth model needs to be updated on {} ", serviceUpdates);
+        for (String baseUrl : serviceUpdates) {
+            try {
+                int code = dispatchAuthUpdate(baseUrl.trim());
+                if (code != 200) {
+                    log.error("Auth model was not updated on {}, http code is {}", baseUrl, code);
+                }
+                log.info("Auth model update signal was sent to {}, http code is {}", baseUrl, code);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error("Auth model was not updated on {}, exception message is {}", baseUrl, e.getMessage());
             }
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            resp.getEntity().writeTo(baos);
-            final long lastDistUpdate = Long.parseLong(baos.toString());
-            if (lastDistUpdate > lastLocalUpdate) {
-                RdfAuthModel.readAuthModel();
-            }
-        } catch (Exception e) {
-            log.error("error running ModelUpdate", e);
         }
+
+    }
+
+    private int dispatchAuthUpdate(String urlBase) throws ClientProtocolException, IOException {
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
+        HttpPost post = new HttpPost(urlBase + "/callbacks/github/bdrc-auth");
+        HttpResponse response = client.execute(post);
+        return response.getStatusLine().getStatusCode();
     }
 }

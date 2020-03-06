@@ -451,6 +451,8 @@ public class RdfAuthModel implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        Thread t = new Thread(new ModelUpdate());
+        t.start();
     }
 
     public static String getShortName(String st) {
