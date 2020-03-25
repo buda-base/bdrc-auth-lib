@@ -122,6 +122,14 @@ public class User {
         return "";
     }
 
+    public BudaRdfUser getBudaUser() {
+        return budaUser;
+    }
+
+    public void setBudaUser(BudaRdfUser budaUser) {
+        this.budaUser = budaUser;
+    }
+
     public boolean isAdmin() {
         return groups.contains(RdfAuthModel.adminGroupId);
     }
@@ -209,8 +217,8 @@ public class User {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider="
-                + provider + ", connection=" + connection + ", blocked=" + blocked + ", roles=" + roles + ", personalAccess=" + personalAccess
-                + ", groups=" + groups + ", model=" + model + "]";
+                + provider + ", connection=" + connection + ", budaUser=" + budaUser + ", blocked=" + blocked + ", roles=" + roles
+                + ", personalAccess=" + personalAccess + ", groups=" + groups + ", model=" + model + "]";
     }
 
 }

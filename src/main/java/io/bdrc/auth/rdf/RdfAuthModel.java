@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.model.Application;
 import io.bdrc.auth.model.AuthDataModelBuilder;
+import io.bdrc.auth.model.BudaUserInfo;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.Group;
 import io.bdrc.auth.model.Permission;
@@ -122,7 +123,8 @@ public class RdfAuthModel implements Runnable {
         while (it.hasNext()) {
             final Resource rs = it.next();
             final User user = new User();
-            user.setAuthId(rs.getProperty(RdfConstants.AUTHID).getObject().toString());
+            String authId = rs.getProperty(RdfConstants.AUTHID).getObject().toString();
+            user.setAuthId(authId);
             user.setName(rs.getProperty(FOAF.name).getObject().toString());
             user.setEmail(rs.getProperty(FOAF.mbox).getObject().toString());
             user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject().toString());
@@ -130,6 +132,7 @@ public class RdfAuthModel implements Runnable {
             user.setUserId(getShortName(userId));
             user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
             user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
+            user.setBudaUser(BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1)));
             StmtIterator sit = rs.listProperties(RdfConstants.HAS_ROLE);
             while (sit.hasNext()) {
                 final Statement st = sit.next();

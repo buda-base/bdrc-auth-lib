@@ -55,7 +55,6 @@ public class ModelUpdate implements Runnable {
                     }
                     log.info("Auth model update signal was sent to {}, http code is {}", baseUrl, code);
                 } catch (IOException e) {
-                    e.printStackTrace();
                     log.error("Auth model was not updated on {}, exception message is {}", baseUrl, e.getMessage());
                 }
             }
