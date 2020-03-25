@@ -19,10 +19,8 @@ public class BudaUserInfo {
     public static final String BDOU_PFX = "http://purl.bdrc.io/ontology/ext/user/";
     private static HashMap<String, BudaRdfUser> budaUserByAuth0Id;
 
-    private static Model loadModel(String fusekiUrl) {
-        if (fusekiUrl == null) {
-            fusekiUrl = AuthProps.getProperty("fusekiAuthData");
-        }
+    private static Model loadModel() {
+        String fusekiUrl = AuthProps.getProperty("fusekiAuthData");
         Model infos = ModelFactory.createDefaultModel();
         String query = "construct {  " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL + "> ?label. } " + "where { " + "{ "
                 + "?s ?p ?o. ?s a <" + BDOU_PFX + "User>. " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL + "> ?label. "
@@ -33,9 +31,9 @@ public class BudaUserInfo {
         return infos;
     }
 
-    public static HashMap<String, BudaRdfUser> getBudaRdfUsers(String fusekiUrl) {
+    public static HashMap<String, BudaRdfUser> getBudaRdfUsers() {
         if (budaUserByAuth0Id == null) {
-            Model m = loadModel(fusekiUrl);
+            Model m = loadModel();
             budaUserByAuth0Id = new HashMap<>();
             ResIterator it = m.listSubjects();
             Property authId = ResourceFactory.createProperty(BDOU_PFX + "hasUserProfile");
@@ -43,18 +41,19 @@ public class BudaUserInfo {
             while (it.hasNext()) {
                 Resource rs = it.next();
                 String auth0Id = rs.getPropertyResourceValue(authId).getURI();
+                String key = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
                 String label = rs.getProperty(lab).getObject().asLiteral().getString();
                 System.out.println("************************************" + rs.getURI());
                 System.out.println("*Res auth0Id : " + auth0Id);
                 System.out.println("*Name : " + label);
-                budaUserByAuth0Id.put(auth0Id, new BudaRdfUser(rs.getURI(), auth0Id, label));
+                budaUserByAuth0Id.put(key, new BudaRdfUser(rs.getURI(), auth0Id, label));
             }
         }
         return budaUserByAuth0Id;
     }
 
-    /*
-     * public static BudaRdfUser getBudaRdfInfo(String auth0id) { return }
-     */
+    public static BudaRdfUser getBudaRdfInfo(String auth0Id) {
+        return getBudaRdfUsers().get(auth0Id);
+    }
 
 }

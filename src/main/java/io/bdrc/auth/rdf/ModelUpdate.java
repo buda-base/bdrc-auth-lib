@@ -44,18 +44,20 @@ public class ModelUpdate implements Runnable {
 
     @Override
     public void run() {
-        List<String> serviceUpdates = Arrays.asList(AuthProps.getProperty("serviceUpdates").split(","));
-        log.info("Auth model needs to be updated on {} ", serviceUpdates);
-        for (String baseUrl : serviceUpdates) {
-            try {
-                int code = dispatchAuthUpdate(baseUrl.trim());
-                if (code != 200) {
-                    log.error("Auth model was not updated on {}, http code is {}", baseUrl, code);
+        if (AuthProps.getProperty("serviceUpdates") != null) {
+            List<String> serviceUpdates = Arrays.asList(AuthProps.getProperty("serviceUpdates").split(","));
+            log.info("Auth model needs to be updated on {} ", serviceUpdates);
+            for (String baseUrl : serviceUpdates) {
+                try {
+                    int code = dispatchAuthUpdate(baseUrl.trim());
+                    if (code != 200) {
+                        log.error("Auth model was not updated on {}, http code is {}", baseUrl, code);
+                    }
+                    log.info("Auth model update signal was sent to {}, http code is {}", baseUrl, code);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    log.error("Auth model was not updated on {}, exception message is {}", baseUrl, e.getMessage());
                 }
-                log.info("Auth model update signal was sent to {}, http code is {}", baseUrl, code);
-            } catch (IOException e) {
-                e.printStackTrace();
-                log.error("Auth model was not updated on {}, exception message is {}", baseUrl, e.getMessage());
             }
         }
 

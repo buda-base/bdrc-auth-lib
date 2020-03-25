@@ -63,6 +63,7 @@ public class RdfConstants {
     public final static String PERSONAL_ACCESS_URI = AUTH_VOC_BASE + "personalAccess";
     public final static Property ANY_STATUS = ResourceFactory.createProperty(AUTH_VOC_BASE + "forAnyStatus");
     public final static String ANY_STATUS_URI = AUTH_VOC_BASE + "forAnyStatus";
+    public final static Property BUDA_USER = ResourceFactory.createProperty(AUTH_VOC_BASE + "hasBudaUser");
 
     public static final String RESTRICTED_SEALED = "AccessRestrictedSealed";
     public static final String RESTRICTED_CHINA = "AccessRestrictedInChina";

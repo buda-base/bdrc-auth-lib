@@ -44,6 +44,7 @@ public class User {
     String isSocial;
     String provider;
     String connection;
+    BudaRdfUser budaUser;
     boolean blocked;
     ArrayList<String> roles;
     ArrayList<String> personalAccess;
@@ -73,7 +74,9 @@ public class User {
             provider = getJsonValue(ids, "provider");
             connection = getJsonValue(ids, "connection");
         }
+        budaUser = BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1));
         model = buildModel();
+
     }
 
     public User() {
@@ -89,6 +92,7 @@ public class User {
         groups = new ArrayList<>();
         personalAccess = new ArrayList<>();
         model = null;
+        budaUser = null;
     }
 
     Model buildModel() {
@@ -101,6 +105,9 @@ public class User {
         res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
         res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
         res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));
+        if (budaUser != null) {
+            res.add(usr, RdfConstants.BUDA_USER, ResourceFactory.createResource(budaUser.getBudaUserId()));
+        }
         for (String role : roles) {
             res.add(usr, RdfConstants.HAS_ROLE, ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
         }
@@ -201,8 +208,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider=" + provider + ", connection=" + connection + ", blocked=" + blocked + ", roles=" + roles
-                + ", personalAccess=" + personalAccess + ", groups=" + groups + ", model=" + model + "]";
+        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider="
+                + provider + ", connection=" + connection + ", blocked=" + blocked + ", roles=" + roles + ", personalAccess=" + personalAccess
+                + ", groups=" + groups + ", model=" + model + "]";
     }
 
 }
