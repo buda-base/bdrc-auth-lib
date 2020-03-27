@@ -303,7 +303,10 @@ public class RdfAuthModel implements Runnable {
         while (it.hasNext()) {
             final ResourceAccess acc = new ResourceAccess();
             final Resource rs = it.next();
-            acc.setPermission(rs.getProperty(RdfConstants.FOR_PERM).getObject().asResource().getLocalName());
+            // Cannot use .getLocalName() here : seems like a weird jena Bug
+            // as this method works for policy strings...
+            String uri = rs.getProperty(RdfConstants.FOR_PERM).getObject().asResource().getURI();
+            acc.setPermission(uri.substring(uri.lastIndexOf("/") + 1));
             acc.setPolicy(rs.getProperty(RdfConstants.POLICY).getObject().asResource().getLocalName());
             access.add(acc);
         }
@@ -393,6 +396,7 @@ public class RdfAuthModel implements Runnable {
     public static ResourceAccess getResourceAccess(final String accessType) {
         if (access == null) {
             access = getResourceAccess();
+
         }
         for (final ResourceAccess acc : access) {
             final String policy = acc.getPolicy();

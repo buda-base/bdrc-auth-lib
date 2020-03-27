@@ -43,9 +43,6 @@ public class BudaUserInfo {
                 String auth0Id = rs.getPropertyResourceValue(authId).getURI();
                 String key = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
                 String label = rs.getProperty(lab).getObject().asLiteral().getString();
-                System.out.println("************************************" + rs.getURI());
-                System.out.println("*Res auth0Id : " + auth0Id);
-                System.out.println("*Name : " + label);
                 budaUserByAuth0Id.put(key, new BudaRdfUser(rs.getURI(), auth0Id, label));
             }
         }

@@ -151,6 +151,7 @@ public class Access {
         final ResourceAccess access = RdfAuthModel.getResourceAccess(accessTypeLocalName);
         if (access != null) {
             for (final String pm : user.getPermissions()) {
+
                 if (access.getPermission().equals(pm)) {
                     return true;
                 }
