@@ -2,6 +2,9 @@ package io.bdrc.auth;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.ResourceAccess;
 import io.bdrc.auth.model.User;
@@ -33,6 +36,8 @@ public class Access {
     final UserProfile user;
     final Endpoint endpoint;
 
+    public final static Logger log = LoggerFactory.getLogger(Access.class.getName());
+
     public static enum AccessLevel {
         OPEN, FAIR_USE, MIXED, NOACCESS
     }
@@ -41,22 +46,29 @@ public class Access {
         super();
         this.user = user;
         this.endpoint = endpoint;
+        log.info("Initialized Access with User {}", user);
     }
 
     public Access() {
         this.user = new UserProfile();
         this.endpoint = new Endpoint();
+        log.info("Initialized Access with default empty user and endpoint");
     }
 
     public boolean hasEndpointAccess() {
-        return matchGroup() || matchRole() || matchPermissions();
+        boolean acc = matchGroup() || matchRole() || matchPermissions();
+        log.info("User {} has enpoint Access ? {}", user, acc);
+        return acc;
     }
 
     public boolean hasResourceAccess(String accessType) {
         if (RdfConstants.OPEN.equals(accessType)) {
+            log.info("User {} has resource Access ?", user);
             return true;
         }
-        return matchResourcePermissions(accessType);
+        boolean acc = matchResourcePermissions(accessType);
+        log.info("Does User {} have resource Access ?", user, acc);
+        return acc;
     }
 
     public boolean isUserLoggedIn() {
@@ -64,6 +76,7 @@ public class Access {
     }
 
     public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
+        // for accesShortName AccessFairUse and StatusReleased, access level is OPEN
         if (!canUserAccessStatus(resourceStatusLocalName)) {
             if (canUserAccessResource(resourceUri)) {
                 return AccessLevel.OPEN;
@@ -94,23 +107,30 @@ public class Access {
 
     public boolean canUserAccessStatus(final String resourceStatusLocalName) {
         if (RdfConstants.STATUS_RELEASED.equals(resourceStatusLocalName)) {
+            log.info("User {} can access status {} ", user, resourceStatusLocalName);
             return true;
         }
         ArrayList<String> groups = user.getGroups();
         ArrayList<String> anyStatusGroups = RdfAuthModel.getAnyStatusGroup();
         for (String s : groups) {
             if (anyStatusGroups.contains(RdfConstants.AUTH_RESOURCE_BASE + s)) {
+                log.info("User {} with groups {} can access status {} ", user, groups, s);
                 return true;
             }
         }
+        log.info("User {} with groups {} cannot get access for statusGroups {} ", user, groups, anyStatusGroups);
         return false;
     }
 
     public boolean canUserAccessResource(final String resourceUri) {
         ArrayList<String> personalAccess = RdfAuthModel.getPersonalAccess(RdfConstants.AUTH_RESOURCE_BASE + user.getUser().getUserId());
+        log.info("User {} has personnal access {}", user, personalAccess);
         if (personalAccess != null) {
-            return personalAccess.contains(resourceUri);
+            boolean acc = personalAccess.contains(resourceUri);
+            log.info("User {} has personnal access to {}  ? {}", user, resourceUri, acc);
+            return acc;
         }
+        log.info("User {} cannot access resource {} ", user, resourceUri);
         return false;
     }
 
@@ -121,6 +141,7 @@ public class Access {
                 return true;
             }
         }
+        log.info("Do user groups {} match endpoint {} groups {} : {}", user.getGroups(), endpoint, endpoint.getGroups(), match);
         return match;
     }
 
@@ -131,6 +152,7 @@ public class Access {
                 return true;
             }
         }
+        log.info("Do user roles {} match endpoint {} roles {} : {}", user.getRoles(), endpoint, endpoint.getRoles(), match);
         return match;
     }
 
@@ -141,22 +163,26 @@ public class Access {
                 return true;
             }
         }
+        log.info("Do user permissions {} match endpoint {} permissions {} : {}", user.getPermissions(), endpoint, endpoint.getPermissions(), match);
         return match;
     }
 
     public boolean matchResourcePermissions(final String accessTypeLocalName) {
         if (RdfConstants.OPEN.equals(accessTypeLocalName)) {
+            log.info("Resource access is OPEN");
             return true;
         }
         final ResourceAccess access = RdfAuthModel.getResourceAccess(accessTypeLocalName);
+        log.info("Resource access is not OPEN it is {} for type parameter {} ", access, accessTypeLocalName);
         if (access != null) {
             for (final String pm : user.getPermissions()) {
-
                 if (access.getPermission().equals(pm)) {
+                    log.info("User permissions {} match ResourceAccess {} permission {} ", user.getPermissions(), access, access.getPermission());
                     return true;
                 }
             }
         }
+        log.info("User permissions {} DO NOT match ResourceAccess {} permission {} ", user.getPermissions(), access, access.getPermission());
         return false;
     }
 

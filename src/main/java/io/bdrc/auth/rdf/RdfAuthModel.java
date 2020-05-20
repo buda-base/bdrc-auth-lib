@@ -396,7 +396,6 @@ public class RdfAuthModel implements Runnable {
     public static ResourceAccess getResourceAccess(final String accessType) {
         if (access == null) {
             access = getResourceAccess();
-
         }
         for (final ResourceAccess acc : access) {
             final String policy = acc.getPolicy();
