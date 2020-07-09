@@ -34,7 +34,7 @@ public class UserProfile {
     ArrayList<String> roles;
     ArrayList<String> permissions;
     String name;
-    final User user;
+    User user;
 
     public UserProfile(final DecodedJWT decodedJwt) {
 
@@ -47,6 +47,7 @@ public class UserProfile {
             this.permissions = RdfAuthModel.getPermissions(roles, groups);
             this.name = user.getName();
         } else {
+            this.user = new User();
             this.groups = new ArrayList<>();
             this.roles = new ArrayList<>();
             this.permissions = new ArrayList<>();
