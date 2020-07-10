@@ -41,7 +41,8 @@ public class UserProfile {
         final String id = getId(decodedJwt);
         user = RdfAuthModel.getUser(id);
 
-        if (user != null) {
+        // if (user != null) {
+        if (id.equals("TEST")) {
             this.groups = RdfAuthModel.getUser(id).getGroups();
             this.roles = RdfAuthModel.getUser(id).getRoles();
             this.permissions = RdfAuthModel.getPermissions(roles, groups);
@@ -51,7 +52,9 @@ public class UserProfile {
             this.groups = new ArrayList<>();
             this.roles = new ArrayList<>();
             this.permissions = new ArrayList<>();
-            this.name = "";
+            this.user.setName(getName(decodedJwt));
+            this.user.setUserId(getId(decodedJwt));
+            this.user.setAuthId(getAuth0Id(decodedJwt));
         }
     }
 
@@ -85,6 +88,17 @@ public class UserProfile {
             final String id = claim.asString();
             if (!id.endsWith("@clients")) {
                 return id.substring(id.indexOf("|") + 1);
+            }
+        }
+        return "";
+    }
+
+    String getAuth0Id(final DecodedJWT decodedJwt) {
+        final Claim claim = decodedJwt.getClaims().get("sub");
+        if (claim != null) {
+            final String id = claim.asString();
+            if (!id.endsWith("@clients")) {
+                return id;
             }
         }
         return "";

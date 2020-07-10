@@ -119,6 +119,7 @@ public class TokenValidation {
 
     @Override
     public String toString() {
-        return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token=" + tokenStr + ", valid=" + valid + "]";
+        return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token=" + tokenStr + ", valid=" + valid
+                + "]";
     }
 }
