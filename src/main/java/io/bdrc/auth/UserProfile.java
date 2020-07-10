@@ -41,8 +41,7 @@ public class UserProfile {
         final String id = getId(decodedJwt);
         user = RdfAuthModel.getUser(id);
 
-        // if (user != null) {
-        if (id.equals("TEST")) {
+        if (user != null) {
             this.groups = RdfAuthModel.getUser(id).getGroups();
             this.roles = RdfAuthModel.getUser(id).getRoles();
             this.permissions = RdfAuthModel.getPermissions(roles, groups);
@@ -52,7 +51,10 @@ public class UserProfile {
             this.groups = new ArrayList<>();
             this.roles = new ArrayList<>();
             this.permissions = new ArrayList<>();
+            // by default email and name are the same
+            // auth0 requires email for registration, both in dashboard and on register page
             this.user.setName(getName(decodedJwt));
+            this.user.setEmail(getName(decodedJwt));
             this.user.setUserId(getId(decodedJwt));
             this.user.setAuthId(getAuth0Id(decodedJwt));
         }
