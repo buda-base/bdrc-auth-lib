@@ -10,14 +10,18 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.AuthProps;
+
 
 public class BudaUserInfo {
 
     public final static String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
     public static final String BDOU_PFX = "http://purl.bdrc.io/ontology/ext/user/";
     private static HashMap<String, BudaRdfUser> budaUserByAuth0Id;
+    public final static Logger log = LoggerFactory.getLogger(BudaUserInfo.class.getName());
 
     private static Model loadModel() {
         String fusekiUrl = AuthProps.getProperty("fusekiAuthData");
@@ -40,9 +44,14 @@ public class BudaUserInfo {
             Property lab = ResourceFactory.createProperty(SKOS_PREF_LABEL);
             while (it.hasNext()) {
                 Resource rs = it.next();
-                String auth0Id = rs.getPropertyResourceValue(authId).getURI();
-                String key = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);
-                String label = rs.getProperty(lab).getObject().asLiteral().getString();
+                String auth0Id = rs.getPropertyResourceValue(authId).getURI();                
+                String key = auth0Id.substring(auth0Id.lastIndexOf("/") + 1);                
+                String label=rs.getProperty(lab).getObject().toString();
+                if(label.indexOf("/")>0) {
+                    label=label.substring(label.lastIndexOf("/")+1);
+                }else {                    
+                    label = rs.getProperty(lab).getObject().asLiteral().getString();
+                }                
                 budaUserByAuth0Id.put(key, new BudaRdfUser(rs.getURI(), auth0Id, label));
             }
         }
