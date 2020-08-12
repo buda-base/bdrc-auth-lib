@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
@@ -442,8 +443,9 @@ public class RdfAuthModel implements Runnable {
     // and each time a callback to that server is triggerred.
     // a new update time is then set by resetModel().
     public static void updateAuthData(String fusekiUrl) {
+        log.info("Updating auth data >> " + fusekiUrl);
         if (fusekiUrl == null) {
-            fusekiUrl = AuthProps.getProperty("fusekiUrl");
+            fusekiUrl = AuthProps.getProperty("fusekiAuthData");
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         log.info("Service fuseki >> " + fusekiUrl);
@@ -475,7 +477,7 @@ public class RdfAuthModel implements Runnable {
         log.info("Done loading and updating rdfAuth Model");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClientProtocolException, IOException {
         // Properties props = new Properties();
         // InputStream input =
         // Rdf.class.getClassLoader().getResourceAsStream("iiifpres.properties");
@@ -484,7 +486,9 @@ public class RdfAuthModel implements Runnable {
         try {
             InputStream is = new FileInputStream("/etc/buda/share/shared-private.properties");
             props.load(is);
-            is = new FileInputStream("/etc/buda/iiifpres/iiifpres.properties");
+            is = new FileInputStream("/etc/buda/ldspdi/ldspdi.properties");
+            props.load(is);
+            is = new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
             props.load(is);
             is.close();
 
@@ -492,8 +496,11 @@ public class RdfAuthModel implements Runnable {
             // do nothing, continue props initialization
         }
         AuthProps.init(props);
-        Thread t = new Thread(new RdfAuthModel());
-        t.start();
+        //Thread t = new Thread(new RdfAuthModel());
+        //t.start();
+        //AuthDataModelBuilder builder=new AuthDataModelBuilder();
+        updateAuthData(null);
+        
     }
 
 }

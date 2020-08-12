@@ -2,6 +2,7 @@ package io.bdrc.auth.model;
 
 import java.util.ArrayList;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -44,6 +45,9 @@ public class User {
     String isSocial;
     String provider;
     String connection;
+    String created;
+    String updated;
+    String lastLogin;
     BudaRdfUser budaUser;
     boolean blocked;
     ArrayList<String> roles;
@@ -55,6 +59,9 @@ public class User {
         authId = getJsonValue(json, "user_id");
         name = getJsonValue(json, "name");
         email = getJsonValue(json, "email");
+        created= getJsonValue(json, "created_at");
+        updated= getJsonValue(json, "updated_at");
+        lastLogin= getJsonValue(json, "last_login");
         String blck = getJsonValue(json, "blocked");
         if (!blck.equals("")) {
             try {
@@ -105,6 +112,9 @@ public class User {
         res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
         res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
         res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));
+        res.add(usr, RdfConstants.CREATED, ResourceFactory.createTypedLiteral(created,XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.UPDATED, ResourceFactory.createTypedLiteral(updated,XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.LAST_LOGIN, ResourceFactory.createTypedLiteral(lastLogin,XSDDatatype.XSDdateTime));
         if (budaUser != null) {
             res.add(usr, RdfConstants.BUDA_USER, ResourceFactory.createResource(budaUser.getBudaUserId()));
         }
