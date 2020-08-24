@@ -69,8 +69,6 @@ public class RdfAuthModel implements Runnable {
     static Long updated = null;
     public static String adminGroupId;
 
-    private static int PERIOD_MS;
-    private static final int DELAY_MS = 5000;
     public final static Logger log = LoggerFactory.getLogger(RdfAuthModel.class.getName());
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
@@ -496,11 +494,11 @@ public class RdfAuthModel implements Runnable {
             // do nothing, continue props initialization
         }
         AuthProps.init(props);
-        //Thread t = new Thread(new RdfAuthModel());
-        //t.start();
-        //AuthDataModelBuilder builder=new AuthDataModelBuilder();
+        // Thread t = new Thread(new RdfAuthModel());
+        // t.start();
+        // AuthDataModelBuilder builder=new AuthDataModelBuilder();
         updateAuthData(null);
-        
+
     }
 
 }
