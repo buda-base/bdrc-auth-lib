@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.jena.query.DatasetAccessor;
@@ -16,6 +17,8 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -77,7 +80,7 @@ public class RdfAuthModel implements Runnable {
     }
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
-    public static void initForTest(boolean update, boolean isTest) {
+    public static void initForTest(boolean update, boolean isTest) throws InterruptedException, ExecutionException {
         if (update) {
             updateAuthData(null);
         } else {
@@ -440,7 +443,7 @@ public class RdfAuthModel implements Runnable {
     // This MUST BE used at startup by the server implementing webhooks callbacks
     // and each time a callback to that server is triggerred.
     // a new update time is then set by resetModel().
-    public static void updateAuthData(String fusekiUrl) {
+    public static void updateAuthData(String fusekiUrl) throws InterruptedException, ExecutionException {
         log.info("Updating auth data >> " + fusekiUrl);
         if (fusekiUrl == null) {
             fusekiUrl = AuthProps.getProperty("fusekiAuthData");
@@ -448,10 +451,11 @@ public class RdfAuthModel implements Runnable {
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         log.info("Service fuseki >> " + fusekiUrl);
         log.info("authDataGraph >> " + AuthProps.getProperty("authDataGraph"));
-        final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
         try {
             final AuthDataModelBuilder auth = new AuthDataModelBuilder();
-            access.putModel(AuthProps.getProperty("authDataGraph"), auth.getModel());
+            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            rvf.put(AuthProps.getProperty("authDataGraph"), auth.getModel());
+            rvf.close();
             resetModel(auth.getModel());
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -475,7 +479,8 @@ public class RdfAuthModel implements Runnable {
         log.info("Done loading and updating rdfAuth Model");
     }
 
-    public static void main(String[] args) throws ClientProtocolException, IOException {
+    public static void main(String[] args)
+            throws ClientProtocolException, IOException, InterruptedException, ExecutionException {
         // Properties props = new Properties();
         // InputStream input =
         // Rdf.class.getClassLoader().getResourceAsStream("iiifpres.properties");

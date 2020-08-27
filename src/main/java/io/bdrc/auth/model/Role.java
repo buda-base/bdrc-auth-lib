@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.bdrc.auth.rdf.RdfConstants;
@@ -43,10 +44,15 @@ public class Role {
     String appId;
     String name;
     String desc;
+    ArrayList<String> usersWithRole;
     ArrayList<String> permissions;
     Model model;
 
+    @SuppressWarnings("unchecked")
     public Role(JsonNode json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode n = json.findValue("users");
+        usersWithRole = mapper.readValue(mapper.writeValueAsString(n), ArrayList.class);
         id = getJsonValue(json, "_id");
         name = getJsonValue(json, "name");
         desc = getJsonValue(json, "description");
@@ -60,7 +66,12 @@ public class Role {
                 permissions.add(it.next().asText());
             }
         }
+        System.out.println("USERS IN ROLE LIST >> " + getUsersWithRole());
         model = buildModel();
+    }
+
+    public ArrayList<String> getUsersWithRole() {
+        return usersWithRole;
     }
 
     public Role() {
@@ -149,8 +160,10 @@ public class Role {
 
     @Override
     public String toString() {
+        System.out.println("ROLE model=");
+        model.write(System.out, "TURTLE");
         return "Role [id=" + id + ", appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc=" + desc
-                + ", permissions=" + permissions + ", model=" + model + "]";
+                + ", permissions=" + permissions + "]";
     }
 
 }

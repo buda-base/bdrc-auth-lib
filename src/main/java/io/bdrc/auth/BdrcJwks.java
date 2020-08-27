@@ -48,7 +48,7 @@ public class BdrcJwks {
     static RSAPublicKey publicKey;
     static Algorithm algo;
     static Verification verification;
-    static JWTVerifier verifier;
+    static public JWTVerifier verifier;
 
     public final static Logger log = LoggerFactory.getLogger(BdrcJwks.class.getName());
 
@@ -69,7 +69,7 @@ public class BdrcJwks {
             node = mapper.readTree(url);
             publicKey = buildPublicKey();
             algo = Algorithm.RSA256(publicKey, null);
-            verifier=JWT.require(algo).build();
+            verifier = JWT.require(algo).build();
 
         } catch (IOException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             log.error("initialization error", e);

@@ -125,7 +125,7 @@ public class ExportUsersTest {
             System.out.println(n);
             map.put(n.findValue("name").asText(), n.findValue("id").asText());
         });
-        log.info("Connections MAP {}", UserManager.getConnectionsType());
+        log.info("Connections MAP {}", UserManager.getConnectionsType(token));
     }
 
 }

@@ -9,6 +9,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,13 +57,20 @@ public class User {
     ArrayList<String> groups;
     Model model;
 
-    public User(final JsonNode json, final ArrayList<String> roles) throws JsonProcessingException {
+    public final static Logger log = LoggerFactory.getLogger(User.class.getName());
+
+    public User(final JsonNode json, ArrayList<String> roles) throws JsonProcessingException {
+        if (roles == null) {
+            roles = new ArrayList<String>();
+        }
+        long deb = System.currentTimeMillis();
+        log.info("Before creating User {}", deb);
         authId = getJsonValue(json, "user_id");
         name = getJsonValue(json, "name");
         email = getJsonValue(json, "email");
-        created= getJsonValue(json, "created_at");
-        updated= getJsonValue(json, "updated_at");
-        lastLogin= getJsonValue(json, "last_login");
+        created = getJsonValue(json, "created_at");
+        updated = getJsonValue(json, "updated_at");
+        lastLogin = getJsonValue(json, "last_login");
         String blck = getJsonValue(json, "blocked");
         if (!blck.equals("")) {
             try {
@@ -80,10 +89,15 @@ public class User {
             userId = getJsonValue(ids, "user_id");
             provider = getJsonValue(ids, "provider");
             connection = getJsonValue(ids, "connection");
+        } else {
+            isSocial = "";
+            userId = "";
+            provider = "";
+            connection = "";
         }
         budaUser = BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1));
         model = buildModel();
-
+        log.info("creating Buda User and user model took {} ms", System.currentTimeMillis() - deb);
     }
 
     public User() {
@@ -112,9 +126,9 @@ public class User {
         res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
         res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
         res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));
-        res.add(usr, RdfConstants.CREATED, ResourceFactory.createTypedLiteral(created,XSDDatatype.XSDdateTime));
-        res.add(usr, RdfConstants.UPDATED, ResourceFactory.createTypedLiteral(updated,XSDDatatype.XSDdateTime));
-        res.add(usr, RdfConstants.LAST_LOGIN, ResourceFactory.createTypedLiteral(lastLogin,XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.CREATED, ResourceFactory.createTypedLiteral(created, XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.UPDATED, ResourceFactory.createTypedLiteral(updated, XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.LAST_LOGIN, ResourceFactory.createTypedLiteral(lastLogin, XSDDatatype.XSDdateTime));
         if (budaUser != null) {
             res.add(usr, RdfConstants.BUDA_USER, ResourceFactory.createResource(budaUser.getBudaUserId()));
         }
@@ -226,9 +240,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial=" + isSocial + ", provider="
-                + provider + ", connection=" + connection + ", budaUser=" + budaUser + ", blocked=" + blocked + ", roles=" + roles
-                + ", personalAccess=" + personalAccess + ", groups=" + groups + ", model=" + model + "]";
+        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial="
+                + isSocial + ", provider=" + provider + ", connection=" + connection + ", budaUser=" + budaUser
+                + ", blocked=" + blocked + ", roles=" + roles + ", personalAccess=" + personalAccess + ", groups="
+                + groups + ", model=" + model + "]";
     }
 
 }
