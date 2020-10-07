@@ -181,8 +181,8 @@ public class Access {
                     return true;
                 }
             }
+            log.info("User permissions {} DO NOT match ResourceAccess {} permission {} ", user.getPermissions(), access, access.getPermission());
         }
-        log.info("User permissions {} DO NOT match ResourceAccess {} permission {} ", user.getPermissions(), access, access.getPermission());
         return false;
     }
 
