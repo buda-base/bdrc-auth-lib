@@ -27,14 +27,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bdrc.auth.AuthProps;
 import io.bdrc.auth.UserManager;
 
-public class ExportUsersTest {
+public class ExportUsers {
 
     static AuthAPI auth;
     static String token;
     static String publicToken;
     static String adminToken;
 
-    public final static Logger log = LoggerFactory.getLogger(ExportUsersTest.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(ExportUsers.class.getName());
 
     @BeforeClass
     public static void init() throws IOException {

@@ -249,7 +249,7 @@ public class UserManager {
      * Get the latest valid jobId for a given connection Name (i.e "apple") or null
      * if the jobIdis older than 8 hours (auth0 deletes jobs after 8 hours)
      * 
-     * @param connectionId
+     * @param connectionName
      * @return a jobId or null
      */
     public static String getJobIdFromConnectionName(String connectionName) {
