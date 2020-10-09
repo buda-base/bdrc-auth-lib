@@ -377,6 +377,8 @@ public class RdfAuthModel implements Runnable {
     }
 
     public static User getUser(final String userId) {
+        if (users == null)
+            return null;
         return users.get(userId);
     }
 
