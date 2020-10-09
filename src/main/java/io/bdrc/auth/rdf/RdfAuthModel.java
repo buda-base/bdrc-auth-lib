@@ -443,7 +443,7 @@ public class RdfAuthModel implements Runnable {
     // a new update time is then set by resetModel().
     public static void updateAuthData(String fusekiUrl) {
         if (fusekiUrl == null) {
-            fusekiUrl = AuthProps.getProperty("fusekiUrl");
+            fusekiUrl = AuthProps.getProperty("fusekiAuthUrl");
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         log.info("Service fuseki >> " + fusekiUrl);
