@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -368,7 +369,8 @@ public class AuthDataModelBuilder {
 	}
 
 	public static void main(String... args)
-			throws ClientProtocolException, IOException, InterruptedException {
+			throws ClientProtocolException, IOException, InterruptedException,
+			ExecutionException, URISyntaxException {
 		Properties props = new Properties();
 		InputStream is = null;
 		try {
@@ -396,8 +398,9 @@ public class AuthDataModelBuilder {
 		// System.out.println("RÔLES >> " + builder.roles);
 		// System.out.println("RÔLES MAPS >> " + builder.getUsersRolesMap());
 		// System.out.println("RÔLES MAPS >> " + builder.users);
-		// builder.model.write(System.out, "Turtle");
+		builder.model.write(System.out, "Turtle");
 		// System.out.println(builder.users);
+
 	}
 
 }
