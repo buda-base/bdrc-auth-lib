@@ -216,7 +216,6 @@ public class UserManager {
 		}
 		return new ConnectionJob(jobId, Calendar.getInstance().getTime(),
 				node.findValue("status").asText(), loc);
-
 	}
 
 	/**

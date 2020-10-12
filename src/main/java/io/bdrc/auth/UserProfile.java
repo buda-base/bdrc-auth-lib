@@ -30,104 +30,106 @@ import io.bdrc.auth.rdf.RdfAuthModel;
 
 public class UserProfile {
 
-    ArrayList<String> groups;
-    ArrayList<String> roles;
-    ArrayList<String> permissions;
-    String name;
-    User user;
+	ArrayList<String> groups;
+	ArrayList<String> roles;
+	ArrayList<String> permissions;
+	String name;
+	User user;
 
-    public UserProfile(final DecodedJWT decodedJwt) {
+	public UserProfile(final DecodedJWT decodedJwt) {
 
-        final String id = getId(decodedJwt);
-        user = RdfAuthModel.getUser(id);
+		final String id = getId(decodedJwt);
+		user = RdfAuthModel.getUser(id);
 
-        if (user != null) {
-            this.groups = RdfAuthModel.getUser(id).getGroups();
-            this.roles = RdfAuthModel.getUser(id).getRoles();
-            this.permissions = RdfAuthModel.getPermissions(roles, groups);
-            this.name = user.getName();
-        } else {
-            this.user = new User();
-            this.groups = new ArrayList<>();
-            this.roles = new ArrayList<>();
-            this.permissions = new ArrayList<>();
-            // by default email and name are the same
-            // auth0 requires email for registration, both in dashboard and on register page
-            this.user.setName(getName(decodedJwt));
-            this.user.setEmail(getName(decodedJwt));
-            this.user.setUserId(getId(decodedJwt));
-            this.user.setAuthId(getAuth0Id(decodedJwt));
-        }
-    }
+		if (user != null) {
+			this.groups = RdfAuthModel.getUser(id).getGroups();
+			this.roles = RdfAuthModel.getUser(id).getRoles();
+			this.permissions = RdfAuthModel.getPermissions(roles, groups);
+			this.name = user.getName();
+		} else {
+			this.user = new User();
+			this.groups = new ArrayList<>();
+			this.roles = new ArrayList<>();
+			this.permissions = new ArrayList<>();
+			// by default email and name are the same
+			// auth0 requires email for registration, both in dashboard and on
+			// register page
+			this.user.setName(getName(decodedJwt));
+			this.user.setEmail(getName(decodedJwt));
+			this.user.setUserId(getId(decodedJwt));
+			this.user.setAuthId(getAuth0Id(decodedJwt));
+		}
+	}
 
-    public UserProfile() {
+	public UserProfile() {
         this.groups = new ArrayList<>();
         this.roles = new ArrayList<>();
         this.permissions = new ArrayList<>();
         this.name = "";
-        this.user = new User();
+        this.user = new User();b
     }
 
-    public ArrayList<String> getGroups() {
-        return groups;
-    }
+	public ArrayList<String> getGroups() {
+		return groups;
+	}
 
-    public ArrayList<String> getRoles() {
-        return roles;
-    }
+	public ArrayList<String> getRoles() {
+		return roles;
+	}
 
-    String getName(final DecodedJWT decodedJwt) {
-        final Claim claim = decodedJwt.getClaims().get("name");
-        if (claim != null) {
-            return claim.asString();
-        }
-        return null;
-    }
+	String getName(final DecodedJWT decodedJwt) {
+		final Claim claim = decodedJwt.getClaims().get("name");
+		if (claim != null) {
+			return claim.asString();
+		}
+		return null;
+	}
 
-    String getId(final DecodedJWT decodedJwt) {
-        final Claim claim = decodedJwt.getClaims().get("sub");
-        if (claim != null) {
-            final String id = claim.asString();
-            if (!id.endsWith("@clients")) {
-                return id.substring(id.indexOf("|") + 1);
-            }
-        }
-        return "";
-    }
+	String getId(final DecodedJWT decodedJwt) {
+		final Claim claim = decodedJwt.getClaims().get("sub");
+		if (claim != null) {
+			final String id = claim.asString();
+			if (!id.endsWith("@clients")) {
+				return id.substring(id.indexOf("|") + 1);
+			}
+		}
+		return "";
+	}
 
-    String getAuth0Id(final DecodedJWT decodedJwt) {
-        final Claim claim = decodedJwt.getClaims().get("sub");
-        if (claim != null) {
-            final String id = claim.asString();
-            if (!id.endsWith("@clients")) {
-                return id;
-            }
-        }
-        return "";
-    }
+	String getAuth0Id(final DecodedJWT decodedJwt) {
+		final Claim claim = decodedJwt.getClaims().get("sub");
+		if (claim != null) {
+			final String id = claim.asString();
+			if (!id.endsWith("@clients")) {
+				return id;
+			}
+		}
+		return "";
+	}
 
-    public ArrayList<String> getPermissions() {
-        return permissions;
-    }
+	public ArrayList<String> getPermissions() {
+		return permissions;
+	}
 
-    public boolean isInGroup(String group) {
-        return groups.contains(group);
-    }
+	public boolean isInGroup(String group) {
+		return groups.contains(group);
+	}
 
-    public boolean hasRole(String role) {
-        return roles.contains(role);
-    }
+	public boolean hasRole(String role) {
+		return roles.contains(role);
+	}
 
-    public boolean hasPermission(String permission) {
-        return permissions.contains(permission);
-    }
+	public boolean hasPermission(String permission) {
+		return permissions.contains(permission);
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    @Override
-    public String toString() {
-        return "User [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";
-    }
+	@Override
+	public String toString() {
+		return "User [groups=" + groups + ", roles=" + roles + ", permissions="
+				+ permissions + ", name=" + name + "]";
+	}
 }
