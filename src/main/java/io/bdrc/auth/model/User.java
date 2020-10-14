@@ -61,8 +61,7 @@ public class User {
     public final static Logger log = LoggerFactory
             .getLogger(User.class.getName());
 
-    public User(final JsonNode json, ArrayList<String> roles)
-            throws JsonProcessingException {
+    public User(final JsonNode json) throws JsonProcessingException {
         if (roles == null) {
             roles = new ArrayList<String>();
         }
@@ -84,7 +83,6 @@ public class User {
                 blocked = true;
             }
         }
-        this.roles = roles;
         groups = new ArrayList<>();
         final JsonNode ids = json.findValue("identities");
         if (ids != null) {

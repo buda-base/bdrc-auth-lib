@@ -314,8 +314,7 @@ public class AuthDataModelBuilder {
         users = new ArrayList<>();
         List<JsonNode> l = UserManager.downloadUsers(token);
         for (JsonNode tmp : l) {
-            final String authId = tmp.findValue("user_id").asText();
-            final User user = new User(tmp, getUsersRolesMap().get(authId));
+            final User user = new User(tmp);
             users.add(user);
             // user.getModel().listStatements().forEachRemaining(st ->
             // model.add(st));
