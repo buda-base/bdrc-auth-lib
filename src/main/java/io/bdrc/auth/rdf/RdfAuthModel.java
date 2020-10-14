@@ -72,7 +72,8 @@ public class RdfAuthModel implements Runnable {
     static Long updated = null;
     public static String adminGroupId;
 
-    public final static Logger log = LoggerFactory.getLogger(RdfAuthModel.class.getName());
+    public final static Logger log = LoggerFactory
+            .getLogger(RdfAuthModel.class.getName());
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
     public static void init() {
@@ -80,7 +81,8 @@ public class RdfAuthModel implements Runnable {
     }
 
     // Reads authModel from fuseki and starts a ModelUpdate timer
-    public static void initForTest(boolean update, boolean isTest) throws InterruptedException, ExecutionException {
+    public static void initForTest(boolean update)
+            throws InterruptedException, ExecutionException {
         if (update) {
             updateAuthData(null);
         } else {
@@ -89,7 +91,8 @@ public class RdfAuthModel implements Runnable {
     }
 
     public static void initForStaticTests() {
-        InputStream stream = Application.class.getClassLoader().getResourceAsStream("rdfAuthTestModel.ttl");
+        InputStream stream = Application.class.getClassLoader()
+                .getResourceAsStream("rdfAuthTestModel.ttl");
         final Model m = ModelFactory.createDefaultModel();
         m.read(stream, "", "TURTLE");
         resetModel(m);
@@ -107,7 +110,8 @@ public class RdfAuthModel implements Runnable {
         return authMod;
     }
 
-    public static boolean isSecuredEndpoint(final String appId, final String path) {
+    public static boolean isSecuredEndpoint(final String appId,
+            final String path) {
         final ArrayList<String> pth = paths.get(appId);
         if (pth != null) {
             return pth.contains(path);
@@ -121,20 +125,26 @@ public class RdfAuthModel implements Runnable {
             return users;
         }
         users = new HashMap<String, User>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.USER);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.USER);
         while (it.hasNext()) {
             final Resource rs = it.next();
             final User user = new User();
-            String authId = rs.getProperty(RdfConstants.AUTHID).getObject().toString();
+            String authId = rs.getProperty(RdfConstants.AUTHID).getObject()
+                    .toString();
             user.setAuthId(authId);
             user.setName(rs.getProperty(FOAF.name).getObject().toString());
             user.setEmail(rs.getProperty(FOAF.mbox).getObject().toString());
-            user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject().toString());
+            user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject()
+                    .toString());
             final String userId = rs.getURI();
             user.setUserId(getShortName(userId));
-            user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
-            user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
-            user.setBudaUser(BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1)));
+            user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject()
+                    .toString());
+            user.setConnection(rs.getProperty(RdfConstants.CONNECTION)
+                    .getObject().toString());
+            user.setBudaUser(BudaUserInfo.getBudaRdfInfo(
+                    authId.substring(authId.lastIndexOf("|") + 1)));
             StmtIterator sit = rs.listProperties(RdfConstants.HAS_ROLE);
             while (sit.hasNext()) {
                 final Statement st = sit.next();
@@ -157,7 +167,8 @@ public class RdfAuthModel implements Runnable {
             return groups;
         }
         groups = new HashMap<String, Group>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.GROUP);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.GROUP);
         while (it.hasNext()) {
             final Group gp = new Group();
             final Resource rs = it.next();
@@ -173,7 +184,8 @@ public class RdfAuthModel implements Runnable {
             }
             gp.setId(getShortName(rs.getURI()));
             gp.setName(rs.getProperty(RDFS.label).getObject().toString());
-            gp.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
+            gp.setDesc(
+                    rs.getProperty(RdfConstants.DESC).getObject().toString());
             if (gp.getName().equals("admin")) {
                 adminGroupId = gp.getId();
             }
@@ -187,20 +199,25 @@ public class RdfAuthModel implements Runnable {
             return roles;
         }
         roles = new HashMap<String, Role>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.ROLE);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.ROLE);
         while (it.hasNext()) {
             final Role role = new Role();
             final Resource rs = it.next();
             StmtIterator sit = rs.listProperties(RdfConstants.HAS_PERMISSION);
             while (sit.hasNext()) {
-                role.getPermissions().add(getShortName(sit.next().getObject().toString()));
+                role.getPermissions()
+                        .add(getShortName(sit.next().getObject().toString()));
             }
             role.setId(getShortName(rs.getURI()));
             role.setName(rs.getProperty(RDFS.label).getObject().toString());
-            role.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
-            final String appId = rs.getProperty(RdfConstants.APPID).getObject().toString();
+            role.setDesc(
+                    rs.getProperty(RdfConstants.DESC).getObject().toString());
+            final String appId = rs.getProperty(RdfConstants.APPID).getObject()
+                    .toString();
             role.setAppId(getShortName(appId));
-            role.setAppType(rs.getProperty(RdfConstants.APPTYPE).getObject().toString());
+            role.setAppType(rs.getProperty(RdfConstants.APPTYPE).getObject()
+                    .toString());
             roles.put(getShortName(rs.getURI()), role);
         }
         return roles;
@@ -211,21 +228,25 @@ public class RdfAuthModel implements Runnable {
             return permissions;
         }
         permissions = new ArrayList<>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.PERMISSION);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.PERMISSION);
         while (it.hasNext()) {
             final Permission perm = new Permission();
             final Resource rs = it.next();
             perm.setId(getShortName(rs.getURI()));
             perm.setName(rs.getProperty(RDFS.label).getObject().toString());
-            perm.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
-            final String appId = rs.getProperty(RdfConstants.APPID).getObject().toString();
+            perm.setDesc(
+                    rs.getProperty(RdfConstants.DESC).getObject().toString());
+            final String appId = rs.getProperty(RdfConstants.APPID).getObject()
+                    .toString();
             perm.setAppId(getShortName(appId));
             permissions.add(perm);
         }
         return permissions;
     }
 
-    public static ArrayList<String> getPermissions(final ArrayList<String> rls, final ArrayList<String> gps) {
+    public static ArrayList<String> getPermissions(final ArrayList<String> rls,
+            final ArrayList<String> gps) {
         final ArrayList<String> perm = new ArrayList<>();
         for (final String rl : rls) {
             final Role role = roles.get(rl);
@@ -257,13 +278,15 @@ public class RdfAuthModel implements Runnable {
         }
         endpoints = new ArrayList<>();
         paths = new HashMap<>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.ENDPOINT);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.ENDPOINT);
         while (it.hasNext()) {
             final Endpoint endp = new Endpoint();
             final Resource rs = it.next();
             StmtIterator sit = rs.listProperties(RdfConstants.FOR_GROUP);
             while (sit.hasNext()) {
-                endp.getGroups().add(getShortName(sit.next().getObject().toString()));
+                endp.getGroups()
+                        .add(getShortName(sit.next().getObject().toString()));
             }
             sit = rs.listProperties(RdfConstants.FOR_ROLE);
             while (sit.hasNext()) {
@@ -272,18 +295,22 @@ public class RdfAuthModel implements Runnable {
             }
             sit = rs.listProperties(RdfConstants.FOR_PERM);
             while (sit.hasNext()) {
-                endp.getPermissions().add(getShortName(sit.next().getObject().toString()));
+                endp.getPermissions()
+                        .add(getShortName(sit.next().getObject().toString()));
             }
             Statement ss = rs.getProperty(RdfConstants.FOR_METHOD);
             if (ss != null) {
                 ArrayList<String> list = new ArrayList<>();
-                for (String s : rs.getProperty(RdfConstants.FOR_METHOD).getObject().toString().split(",")) {
+                for (String s : rs.getProperty(RdfConstants.FOR_METHOD)
+                        .getObject().toString().split(",")) {
                     list.add(s);
                 }
                 endp.setMethods(list);
             }
-            endp.setPath(rs.getProperty(RdfConstants.PATH).getObject().toString());
-            String appId = rs.getProperty(RdfConstants.APPID).getObject().asResource().getLocalName();
+            endp.setPath(
+                    rs.getProperty(RdfConstants.PATH).getObject().toString());
+            String appId = rs.getProperty(RdfConstants.APPID).getObject()
+                    .asResource().getLocalName();
             endp.setAppId(appId);
             endpoints.add(endp);
             ArrayList<String> path = paths.get(endp.getAppId());
@@ -301,15 +328,18 @@ public class RdfAuthModel implements Runnable {
             return access;
         }
         access = new ArrayList<>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.RES_ACCESS);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.RES_ACCESS);
         while (it.hasNext()) {
             final ResourceAccess acc = new ResourceAccess();
             final Resource rs = it.next();
             // Cannot use .getLocalName() here : seems like a weird jena Bug
             // as this method works for policy strings...
-            String uri = rs.getProperty(RdfConstants.FOR_PERM).getObject().asResource().getURI();
+            String uri = rs.getProperty(RdfConstants.FOR_PERM).getObject()
+                    .asResource().getURI();
             acc.setPermission(uri.substring(uri.lastIndexOf("/") + 1));
-            acc.setPolicy(rs.getProperty(RdfConstants.POLICY).getObject().asResource().getLocalName());
+            acc.setPolicy(rs.getProperty(RdfConstants.POLICY).getObject()
+                    .asResource().getLocalName());
             access.add(acc);
         }
         return access;
@@ -321,11 +351,13 @@ public class RdfAuthModel implements Runnable {
         }
         personalAccess = new HashMap<>();
         //
-        final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.PERSONAL_ACCESS);
+        final ResIterator it = authMod
+                .listResourcesWithProperty(RdfConstants.PERSONAL_ACCESS);
         while (it.hasNext()) {
             final Resource rs = it.next();
             String user = rs.getURI();
-            String res = rs.getProperty(RdfConstants.PERSONAL_ACCESS).getObject().asResource().getURI();
+            String res = rs.getProperty(RdfConstants.PERSONAL_ACCESS)
+                    .getObject().asResource().getURI();
             ArrayList<String> access = personalAccess.get(user);
             if (access == null) {
                 access = new ArrayList<>();
@@ -341,7 +373,8 @@ public class RdfAuthModel implements Runnable {
             return anyStatusGroups;
         }
         anyStatusGroups = new ArrayList<>();
-        final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.ANY_STATUS);
+        final ResIterator it = authMod
+                .listResourcesWithProperty(RdfConstants.ANY_STATUS);
         while (it.hasNext()) {
             final Resource rs = it.next();
             String group = rs.getURI();
@@ -365,14 +398,17 @@ public class RdfAuthModel implements Runnable {
             return applications;
         }
         applications = new ArrayList<>();
-        final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.APPLICATION);
+        final ResIterator it = authMod.listResourcesWithProperty(RDF.type,
+                RdfConstants.APPLICATION);
         while (it.hasNext()) {
             final Resource rs = it.next();
             final Application app = new Application();
             app.setName(rs.getProperty(RDFS.label).getObject().toString());
             app.setAppId(getShortName(rs.getURI()));
-            app.setAppType(rs.getProperty(RdfConstants.APPTYPE).getObject().toString());
-            app.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
+            app.setAppType(rs.getProperty(RdfConstants.APPTYPE).getObject()
+                    .toString());
+            app.setDesc(
+                    rs.getProperty(RdfConstants.DESC).getObject().toString());
             applications.add(app);
         }
         return applications;
@@ -412,12 +448,14 @@ public class RdfAuthModel implements Runnable {
     // Used by any application using bdrc-auth-lib
     // The model will then be updated (by ModelUpdate timer)
     // when a new version has been created and published
-    // by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib repo
+    // by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib
+    // repo
     public static void readAuthModel() {
         String fusekiUrl = AuthProps.getProperty("fusekiUrl");
         log.info("Rdf AUTH model read from {} ", fusekiUrl);
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
+        final DatasetAccessor access = DatasetAccessorFactory
+                .createHTTP(fusekiUrl);
         final Model m = access.getModel(AuthProps.getProperty("authDataGraph"));
         if (m != null) {
             resetModel(m);
@@ -440,10 +478,12 @@ public class RdfAuthModel implements Runnable {
     }
 
     // Reloads and reset the model from auth0 and bdrc-auth-lib policies.ttl
-    // This MUST BE used at startup by the server implementing webhooks callbacks
+    // This MUST BE used at startup by the server implementing webhooks
+    // callbacks
     // and each time a callback to that server is triggerred.
     // a new update time is then set by resetModel().
-    public static void updateAuthData(String fusekiUrl) throws InterruptedException, ExecutionException {
+    public static void updateAuthData(String fusekiUrl)
+            throws InterruptedException, ExecutionException {
         log.info("Updating auth data >> " + fusekiUrl);
         if (fusekiUrl == null) {
             fusekiUrl = AuthProps.getProperty("fusekiAuthData");
@@ -453,7 +493,37 @@ public class RdfAuthModel implements Runnable {
         log.info("authDataGraph >> " + AuthProps.getProperty("authDataGraph"));
         try {
             final AuthDataModelBuilder auth = new AuthDataModelBuilder();
-            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
+            RDFConnectionFuseki rvf = RDFConnectionFactory
+                    .connectFuseki(fusekiUrl);
+            rvf.put(AuthProps.getProperty("authDataGraph"), auth.getModel());
+            rvf.close();
+            resetModel(auth.getModel());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Thread t = new Thread(new ModelUpdate());
+        t.start();
+    }
+
+    // Reloads and reset the Groups and rôles from auth0 and update
+    // bdrc-auth-lib policies.ttl
+    // This is used anytime we update groups and rules by calling ldspdi
+    // relevant webhooks which in turn
+    // call other servers webhooks to update the model globally.
+    public static void updateGroupsRolesPermissions(String fusekiUrl)
+            throws InterruptedException, ExecutionException {
+        log.info("Updating auth data >> " + fusekiUrl);
+        if (fusekiUrl == null) {
+            fusekiUrl = AuthProps.getProperty("fusekiAuthData");
+        }
+        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
+        log.info("Service fuseki >> " + fusekiUrl);
+        log.info("authDataGraph >> " + AuthProps.getProperty("authDataGraph"));
+        try {
+            final AuthDataModelBuilder auth = new AuthDataModelBuilder();
+            RDFConnectionFuseki rvf = RDFConnectionFactory
+                    .connectFuseki(fusekiUrl);
             rvf.put(AuthProps.getProperty("authDataGraph"), auth.getModel());
             rvf.close();
             resetModel(auth.getModel());
@@ -479,19 +549,21 @@ public class RdfAuthModel implements Runnable {
         log.info("Done loading and updating rdfAuth Model");
     }
 
-    public static void main(String[] args)
-            throws ClientProtocolException, IOException, InterruptedException, ExecutionException {
+    public static void main(String[] args) throws ClientProtocolException,
+            IOException, InterruptedException, ExecutionException {
         // Properties props = new Properties();
         // InputStream input =
         // Rdf.class.getClassLoader().getResourceAsStream("iiifpres.properties");
         Properties props = new Properties();
         // props.load(input);
         try {
-            InputStream is = new FileInputStream("/etc/buda/share/shared-private.properties");
+            InputStream is = new FileInputStream(
+                    "/etc/buda/share/shared-private.properties");
             props.load(is);
             is = new FileInputStream("/etc/buda/ldspdi/ldspdi.properties");
             props.load(is);
-            is = new FileInputStream("/etc/buda/ldspdi/ldspdi-private.properties");
+            is = new FileInputStream(
+                    "/etc/buda/ldspdi/ldspdi-private.properties");
             props.load(is);
             is.close();
 
@@ -503,7 +575,6 @@ public class RdfAuthModel implements Runnable {
         // t.start();
         // AuthDataModelBuilder builder=new AuthDataModelBuilder();
         updateAuthData(null);
-
     }
 
 }

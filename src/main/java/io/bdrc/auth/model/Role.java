@@ -52,7 +52,8 @@ public class Role {
     public Role(JsonNode json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode n = json.findValue("users");
-        usersWithRole = mapper.readValue(mapper.writeValueAsString(n), ArrayList.class);
+        usersWithRole = mapper.readValue(mapper.writeValueAsString(n),
+                ArrayList.class);
         id = getJsonValue(json, "_id");
         name = getJsonValue(json, "name");
         desc = getJsonValue(json, "description");
@@ -66,7 +67,6 @@ public class Role {
                 permissions.add(it.next().asText());
             }
         }
-        System.out.println("USERS IN ROLE LIST >> " + getUsersWithRole());
         model = buildModel();
     }
 
@@ -92,16 +92,20 @@ public class Role {
     }
 
     Model buildModel() {
-        final Resource role = ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + id);
+        final Resource role = ResourceFactory
+                .createResource(RdfConstants.AUTH_RESOURCE_BASE + id);
         final Model res = ModelFactory.createDefaultModel();
         res.add(role, RDF.type, RdfConstants.ROLE);
         res.add(role, RDFS.label, ResourceFactory.createStringLiteral(name));
-        res.add(role, RdfConstants.DESC, ResourceFactory.createStringLiteral(desc));
-        res.add(role, RdfConstants.APPTYPE, ResourceFactory.createStringLiteral(appType));
-        res.add(role, RdfConstants.APPID, ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + appId));
+        res.add(role, RdfConstants.DESC,
+                ResourceFactory.createStringLiteral(desc));
+        res.add(role, RdfConstants.APPTYPE,
+                ResourceFactory.createStringLiteral(appType));
+        res.add(role, RdfConstants.APPID, ResourceFactory
+                .createResource(RdfConstants.AUTH_RESOURCE_BASE + appId));
         for (String perm : permissions) {
-            res.add(role, RdfConstants.HAS_PERMISSION,
-                    ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + perm));
+            res.add(role, RdfConstants.HAS_PERMISSION, ResourceFactory
+                    .createResource(RdfConstants.AUTH_RESOURCE_BASE + perm));
         }
         return res;
     }
@@ -162,8 +166,9 @@ public class Role {
     public String toString() {
         System.out.println("ROLE model=");
         model.write(System.out, "TURTLE");
-        return "Role [id=" + id + ", appType=" + appType + ", appId=" + appId + ", name=" + name + ", desc=" + desc
-                + ", permissions=" + permissions + "]";
+        return "Role [id=" + id + ", appType=" + appType + ", appId=" + appId
+                + ", name=" + name + ", desc=" + desc + ", permissions="
+                + permissions + "]";
     }
 
 }

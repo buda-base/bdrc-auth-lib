@@ -50,7 +50,8 @@ public class BdrcJwks {
     static Verification verification;
     static public JWTVerifier verifier;
 
-    public final static Logger log = LoggerFactory.getLogger(BdrcJwks.class.getName());
+    public final static Logger log = LoggerFactory
+            .getLogger(BdrcJwks.class.getName());
 
     public static final String ALG = PublicClaims.ALGORITHM;
     public static final String KID = PublicClaims.KEY_ID;
@@ -65,13 +66,15 @@ public class BdrcJwks {
 
         try {
             final ObjectMapper mapper = new ObjectMapper();
+            log.debug("JWKS URL >> {}", AuthProps.getProperty("jwksUrl"));
             final URL url = new URL(AuthProps.getProperty("jwksUrl"));
             node = mapper.readTree(url);
             publicKey = buildPublicKey();
             algo = Algorithm.RSA256(publicKey, null);
             verifier = JWT.require(algo).build();
 
-        } catch (IOException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException e) {
+        } catch (IOException | CertificateException | InvalidKeySpecException
+                | NoSuchAlgorithmException e) {
             log.error("initialization error", e);
         }
     }
@@ -83,11 +86,14 @@ public class BdrcJwks {
         return node.findValue(key).asText();
     }
 
-    static RSAPublicKey buildPublicKey()
-            throws CertificateException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(getValue(N)));
-        BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(getValue(E)));
-        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent));
+    static RSAPublicKey buildPublicKey() throws CertificateException,
+            IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        BigInteger modulus = new BigInteger(1,
+                Base64.getUrlDecoder().decode(getValue(N)));
+        BigInteger exponent = new BigInteger(1,
+                Base64.getUrlDecoder().decode(getValue(E)));
+        return (RSAPublicKey) KeyFactory.getInstance("RSA")
+                .generatePublic(new RSAPublicKeySpec(modulus, exponent));
     }
 
     public static RSAPublicKey getPublicKey() {
