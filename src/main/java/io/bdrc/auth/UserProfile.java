@@ -1,6 +1,10 @@
 package io.bdrc.auth;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -36,16 +40,43 @@ public class UserProfile {
     String name;
     User user;
 
+    public final static Logger log = LoggerFactory.getLogger(UserProfile.class.getName());
+
     public UserProfile(final DecodedJWT decodedJwt) {
+
+        // these claim names come from the javascript rules defined in auth0
+        // bdrc.io tenant dashboard
+        List<String> n_roles = decodedJwt.getClaims().get("https://auth.bdrc.io/roles").asList(String.class);
+        List<String> n_groups = decodedJwt.getClaims().get("https://auth.bdrc.io/groups").asList(String.class);
+        List<String> n_perms = decodedJwt.getClaims().get("https://auth.bdrc.io/permissions").asList(String.class);
 
         final String id = getId(decodedJwt);
         user = RdfAuthModel.getUser(id);
 
         if (user != null) {
-            this.groups = RdfAuthModel.getUser(id).getGroups();
-            this.roles = RdfAuthModel.getUser(id).getRoles();
-            this.permissions = RdfAuthModel.getPermissions(roles, groups);
+            /**
+             * lets keep this commented here as it shows "the old way" to get
+             * credentials (groups, roles, permissions) from the loaded
+             * RDFAuthModel
+             ***/
+            // this.groups = RdfAuthModel.getUser(id).getGroups();
+            // this.roles = RdfAuthModel.getUser(id).getRoles();
+            // this.permissions = RdfAuthModel.getPermissions(roles, groups);
+            /**
+             * New way of getting groups, roles and permissions, i.e from the
+             * token, so any change to a user credentials applies in real time
+             * (after logout/login back) Therefore, for instance, if a user is
+             * added to an existing group, then this change applies immediately
+             * after logout/login back. NOTE: keep in mind that changes made to
+             * the groups, roles or permissions themselves are not reflected
+             * here in real time When such changes occur, RDFAuthModel must be
+             * rebuilt and updated using the relevant webhook on ldspdi.
+             **/
+            this.groups = RdfAuthModel.getGroupsIdByName(n_groups);
+            this.roles = RdfAuthModel.getRolesIdByName(n_roles);
+            this.permissions = RdfAuthModel.getPermissionsIdByName(n_perms);
             this.name = user.getName();
+
         } else {
             this.user = new User();
             this.groups = new ArrayList<>();
@@ -129,7 +160,6 @@ public class UserProfile {
 
     @Override
     public String toString() {
-        return "User [groups=" + groups + ", roles=" + roles + ", permissions="
-                + permissions + ", name=" + name + "]";
+        return "User [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";
     }
 }
