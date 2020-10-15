@@ -64,7 +64,7 @@ public class ModelUpdate implements Runnable {
 
     private int dispatchAuthUpdate(String urlBase) throws ClientProtocolException, IOException {
         HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
-        HttpPost post = new HttpPost(urlBase + "/callbacks/github/bdrc-auth");
+        HttpPost post = new HttpPost(urlBase);
         HttpResponse response = client.execute(post);
         return response.getStatusLine().getStatusCode();
     }
