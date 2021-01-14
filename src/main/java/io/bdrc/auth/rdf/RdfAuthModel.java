@@ -11,6 +11,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
@@ -19,8 +23,10 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -468,11 +474,25 @@ public class RdfAuthModel implements Runnable {
     // by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib
     // repo
     public static void readAuthModel() {
-        String fusekiUrl = AuthProps.getProperty("fusekiUrl");
-        log.info("Rdf AUTH model read from {} ", fusekiUrl);
-        fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
-        final DatasetAccessor access = DatasetAccessorFactory.createHTTP(fusekiUrl);
-        final Model m = access.getModel(AuthProps.getProperty("authDataGraph"));
+        String fusekiUrlBase = AuthProps.getProperty("fusekiUrl");
+        log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
+        fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
+        int timeout = 5;
+        RequestConfig config = RequestConfig.custom()
+          .setConnectTimeout(timeout * 1000)
+          .setConnectionRequestTimeout(timeout * 1000)
+          .setSocketTimeout(timeout * 1000).build();
+        CloseableHttpClient client = 
+          HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create()
+                .destination(fusekiUrlBase)
+                .queryEndpoint(fusekiUrlBase+"/query")
+                .gspEndpoint(fusekiUrlBase+"/data")
+                .updateEndpoint(fusekiUrlBase+"/update")
+                .httpClient(client);
+        RDFConnection fuConn = fuConnBuilder.build();
+        final Model m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
+        log.info("Got auth model");
         if (m != null) {
             resetModel(m);
             update(System.currentTimeMillis());
