@@ -53,11 +53,19 @@ public class TokenValidation {
     }
 
     void setScopes() {
-        final Claim cl = decodedJwt.getClaims().get("scope");
-        if (cl != null) {
-            scopes = Arrays.asList(cl.asString().split(" "));
-        } else {
-            scopes = Arrays.asList("".split(" "));
+        try {
+            final Claim cl = decodedJwt.getClaims().get("scope");
+            if (cl != null) {
+                scopes = Arrays.asList(cl.asString().split(" "));
+            } else {
+                scopes = Arrays.asList("".split(" "));
+            }
+        } catch (Exception ex) {
+            if (decodedJwt != null) {
+                log.warn("Failed with decodedJwt {} and claims {}", decodedJwt, decodedJwt.getClaims());
+            } else {
+                log.warn("decodedJwt is null for token {}", tokenStr);
+            }
         }
     }
 
@@ -119,7 +127,7 @@ public class TokenValidation {
 
     @Override
     public String toString() {
-        return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token=" + tokenStr + ", valid=" + valid
-                + "]";
+        return "TokenValidation [decodedJwt=" + decodedJwt + ", scopes=" + scopes + ", user=" + user + ", token="
+                + tokenStr + ", valid=" + valid + "]";
     }
 }
