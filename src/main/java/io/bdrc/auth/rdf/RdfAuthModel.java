@@ -490,7 +490,6 @@ public class RdfAuthModel implements Runnable {
         RDFConnection fuConn = fuConnBuilder.build();
         final Model m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
         log.info("Got auth model");
-        m.write(System.out, "TURTLE");
         if (m != null) {
             resetModel(m);
             update(System.currentTimeMillis());
@@ -577,8 +576,6 @@ public class RdfAuthModel implements Runnable {
         // AuthDataModelBuilder builder=new AuthDataModelBuilder();
         updateAuthData(null);
         // RdfAuthModel.init();
-        System.out.println("ROLES >>" + getRoles());
-
     }
 
 }
