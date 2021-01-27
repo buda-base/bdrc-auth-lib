@@ -58,15 +58,14 @@ public class User {
     ArrayList<String> groups;
     Model model;
 
-    public final static Logger log = LoggerFactory
-            .getLogger(User.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(User.class.getName());
 
     public User(final JsonNode json) throws JsonProcessingException {
         if (roles == null) {
             roles = new ArrayList<String>();
         }
         long deb = System.currentTimeMillis();
-        log.info("Before creating User {}", deb);
+        log.debug("Before creating User {}", deb);
         authId = getJsonValue(json, "user_id");
         name = getJsonValue(json, "name");
         email = getJsonValue(json, "email");
@@ -96,11 +95,9 @@ public class User {
             provider = "";
             connection = "";
         }
-        budaUser = BudaUserInfo
-                .getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1));
+        budaUser = BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1));
         model = buildModel();
-        log.info("creating Buda User and user model took {} ms",
-                System.currentTimeMillis() - deb);
+        log.debug("creating Buda User and user model took {} ms", System.currentTimeMillis() - deb);
     }
 
     public User() {
@@ -121,33 +118,23 @@ public class User {
 
     Model buildModel() {
         Resource usr = ResourceFactory
-                .createResource(RdfConstants.AUTH_RESOURCE_BASE
-                        + authId.split(Pattern.quote("|"))[1]);
+                .createResource(RdfConstants.AUTH_RESOURCE_BASE + authId.split(Pattern.quote("|"))[1]);
         final Model res = ModelFactory.createDefaultModel();
         res.add(usr, RDF.type, RdfConstants.USER);
-        res.add(usr, RdfConstants.IS_SOCIAL,
-                ResourceFactory.createStringLiteral(isSocial));
-        res.add(usr, RdfConstants.PROVIDER,
-                ResourceFactory.createStringLiteral(provider));
-        res.add(usr, RdfConstants.CONNECTION,
-                ResourceFactory.createStringLiteral(connection));
+        res.add(usr, RdfConstants.IS_SOCIAL, ResourceFactory.createStringLiteral(isSocial));
+        res.add(usr, RdfConstants.PROVIDER, ResourceFactory.createStringLiteral(provider));
+        res.add(usr, RdfConstants.CONNECTION, ResourceFactory.createStringLiteral(connection));
         res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
-        res.add(usr, RdfConstants.AUTHID,
-                ResourceFactory.createStringLiteral(authId));
+        res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
         res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));
-        res.add(usr, RdfConstants.CREATED, ResourceFactory
-                .createTypedLiteral(created, XSDDatatype.XSDdateTime));
-        res.add(usr, RdfConstants.UPDATED, ResourceFactory
-                .createTypedLiteral(updated, XSDDatatype.XSDdateTime));
-        res.add(usr, RdfConstants.LAST_LOGIN, ResourceFactory
-                .createTypedLiteral(lastLogin, XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.CREATED, ResourceFactory.createTypedLiteral(created, XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.UPDATED, ResourceFactory.createTypedLiteral(updated, XSDDatatype.XSDdateTime));
+        res.add(usr, RdfConstants.LAST_LOGIN, ResourceFactory.createTypedLiteral(lastLogin, XSDDatatype.XSDdateTime));
         if (budaUser != null) {
-            res.add(usr, RdfConstants.BUDA_USER,
-                    ResourceFactory.createResource(budaUser.getBudaUserId()));
+            res.add(usr, RdfConstants.BUDA_USER, ResourceFactory.createResource(budaUser.getBudaUserId()));
         }
         for (String role : roles) {
-            res.add(usr, RdfConstants.HAS_ROLE, ResourceFactory
-                    .createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
+            res.add(usr, RdfConstants.HAS_ROLE, ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
         }
         return res;
     }
@@ -254,11 +241,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", authId=" + authId + ", name="
-                + name + ", email=" + email + ", isSocial=" + isSocial
-                + ", provider=" + provider + ", connection=" + connection
-                + ", budaUser=" + budaUser + ", blocked=" + blocked + ", roles="
-                + roles + ", personalAccess=" + personalAccess + ", groups="
+        return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial="
+                + isSocial + ", provider=" + provider + ", connection=" + connection + ", budaUser=" + budaUser
+                + ", blocked=" + blocked + ", roles=" + roles + ", personalAccess=" + personalAccess + ", groups="
                 + groups + ", model=" + model + "]";
     }
 

@@ -46,14 +46,23 @@ public class UserProfile {
 
         // these claim names come from the javascript rules defined in auth0
         // bdrc.io tenant dashboard
+        log.debug("decodedJwt is {}", decodedJwt);
         List<String> n_roles = decodedJwt.getClaims().get("https://auth.bdrc.io/roles").asList(String.class);
         List<String> n_groups = decodedJwt.getClaims().get("https://auth.bdrc.io/groups").asList(String.class);
         List<String> n_perms = decodedJwt.getClaims().get("https://auth.bdrc.io/permissions").asList(String.class);
+        String usrName = decodedJwt.getClaims().get("name").asString();
 
         final String id = getId(decodedJwt);
-        user = RdfAuthModel.getUser(id);
+        log.debug("user id from decodedJwt is {}", id);
+        log.debug("user roles from decodedJwt is {}", n_roles);
+        log.debug("user groups from decodedJwt is {}", n_groups);
+        log.debug("user permissions from decodedJwt is {}", n_perms);
+        log.debug("user name from decodedJwt is {}", usrName);
+        log.debug("user found for id {} in authModel is {}", id, user);
+        log.debug("users in RdfAuthModel {} ", RdfAuthModel.getUsers());
 
-        if (user != null) {
+        if (id != null) {
+            this.user = new User();
             /**
              * lets keep this commented here as it shows "the old way" to get
              * credentials (groups, roles, permissions) from the loaded
@@ -75,7 +84,8 @@ public class UserProfile {
             this.groups = RdfAuthModel.getGroupsIdByName(n_groups);
             this.roles = RdfAuthModel.getRolesIdByName(n_roles);
             this.permissions = RdfAuthModel.getPermissionsIdByName(n_perms);
-            this.name = user.getName();
+            log.debug("user permissions from AuthModel is {}", permissions);
+            this.name = usrName;
 
         } else {
             this.user = new User();

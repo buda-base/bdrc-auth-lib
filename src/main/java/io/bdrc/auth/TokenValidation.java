@@ -46,7 +46,12 @@ public class TokenValidation {
         try {
             valid = checkTokenSignature();
             setScopes();
-            user = new UserProfile(decodedJwt);
+            if (decodedJwt != null) {
+                user = new UserProfile(decodedJwt);
+            } else {
+                user = new UserProfile();
+                log.warn("DecodedJwt is null for token {}", tokenStr);
+            }
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
         }

@@ -85,29 +85,25 @@ public class AuthDataModelBuilder {
 
     static final ObjectMapper mapper = new ObjectMapper();
 
-    public final static Logger log = LoggerFactory
-            .getLogger(AuthDataModelBuilder.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(AuthDataModelBuilder.class.getName());
 
-    public static String webTaskBaseUrl = AuthProps
-            .getProperty("webTaskBaseUrl");
+    public static String webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
     public static String auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
     static String token = null;
     static String token2 = null;
 
-    public AuthDataModelBuilder()
-            throws ClientProtocolException, IOException, InterruptedException {
+    public AuthDataModelBuilder() throws ClientProtocolException, IOException, InterruptedException {
         usersRolesMap = new HashMap<>();
         webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
         auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
         log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
-        HttpURLConnection connection = (HttpURLConnection) new URL(
-                AuthProps.getProperty("policiesUrl")).openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl"))
+                .openConnection();
         InputStream stream = connection.getInputStream();
         final Model authMod = ModelFactory.createDefaultModel();
         authMod.read(stream, "", "TURTLE");
         stream.close();
-        HttpClient client = HttpClientBuilder.create().disableCookieManagement()
-                .build();
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
         post = new HttpPost("https://bdrc-io.auth0.com/oauth/token");
         HashMap<String, String> json = new HashMap<>();
@@ -117,8 +113,7 @@ public class AuthDataModelBuilder {
         json.put("audience", "urn:auth0-authz-api");
         String post_data = mapper.writer().writeValueAsString(json);
         StringEntity se = new StringEntity(post_data);
-        se.setContentType(
-                new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         post.setEntity(se);
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -145,8 +140,7 @@ public class AuthDataModelBuilder {
         json.put("audience", auth0BaseUrl + "api/v2/");
         post_data = mapper.writer().writeValueAsString(json);
         se = new StringEntity(post_data);
-        se.setContentType(
-                new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         post.setEntity(se);
         response = client.execute(post);
         baos = new ByteArrayOutputStream();
@@ -161,11 +155,9 @@ public class AuthDataModelBuilder {
     }
 
     public static String getToken() throws IOException {
-        HttpClient client = HttpClientBuilder.create().disableCookieManagement()
-                .build();
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
-        post = new HttpPost(
-                AuthProps.getProperty("auth0BaseUrl") + "oauth/token");
+        post = new HttpPost(AuthProps.getProperty("auth0BaseUrl") + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
@@ -173,8 +165,7 @@ public class AuthDataModelBuilder {
         json.put("audience", "https://bdrc-io.auth0.com/api/v2/");
         String post_data = mapper.writer().writeValueAsString(json);
         StringEntity se = new StringEntity(post_data);
-        se.setContentType(
-                new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         post.setEntity(se);
         HttpResponse response = client.execute(post);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -185,14 +176,12 @@ public class AuthDataModelBuilder {
         return node.findValue("access_token").asText();
     }
 
-    private void setApps(final String token)
-            throws ClientProtocolException, IOException {
+    private void setApps(final String token) throws ClientProtocolException, IOException {
         log.info("Setting apps >> ");
         apps = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create()
-                .disableCookieManagement().build();
-        final HttpGet get = new HttpGet(auth0BaseUrl
-                + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
+        final HttpGet get = new HttpGet(
+                auth0BaseUrl + "api/v2/clients?fields=name,description,client_id,app_type&include_fields=true");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -207,12 +196,10 @@ public class AuthDataModelBuilder {
         baos.close();
     }
 
-    private void setGroups(final String token)
-            throws ClientProtocolException, IOException {
+    private void setGroups(final String token) throws ClientProtocolException, IOException {
         log.info("Setting groups >> ");
         groups = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create()
-                .disableCookieManagement().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "groups");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -228,12 +215,10 @@ public class AuthDataModelBuilder {
         }
     }
 
-    private void setRoles(final String token)
-            throws ClientProtocolException, IOException {
+    private void setRoles(final String token) throws ClientProtocolException, IOException {
         log.info("Setting roles >> ");
         roles = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create()
-                .disableCookieManagement().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "roles");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -274,25 +259,20 @@ public class AuthDataModelBuilder {
             });
         });
         usersRolesMap.keySet().forEach(id -> {
-            String autId = RdfConstants.AUTH_RESOURCE_BASE
-                    + id.split(Pattern.quote("|"))[1];
+            String autId = RdfConstants.AUTH_RESOURCE_BASE + id.split(Pattern.quote("|"))[1];
             ArrayList<String> roles = usersRolesMap.get(id);
             for (String role : roles) {
-                Statement st = model.createStatement(
-                        ResourceFactory.createResource(autId),
-                        RdfConstants.HAS_ROLE, ResourceFactory.createResource(
-                                RdfConstants.AUTH_RESOURCE_BASE + role));
+                Statement st = model.createStatement(ResourceFactory.createResource(autId), RdfConstants.HAS_ROLE,
+                        ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
                 model.add(st);
             }
         });
     }
 
-    private void setPermissions(String token)
-            throws ClientProtocolException, IOException {
+    private void setPermissions(String token) throws ClientProtocolException, IOException {
         log.info("Setting permissions >> ");
         permissions = new ArrayList<>();
-        final HttpClient client = HttpClientBuilder.create()
-                .disableCookieManagement().build();
+        final HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         final HttpGet get = new HttpGet(webTaskBaseUrl + "permissions");
         get.addHeader("Authorization", "Bearer " + token);
         final HttpResponse resp = client.execute(get);
@@ -308,13 +288,13 @@ public class AuthDataModelBuilder {
         }
     }
 
-    private void setUsers(String token)
-            throws ClientProtocolException, IOException, InterruptedException {
+    private void setUsers(String token) throws ClientProtocolException, IOException, InterruptedException {
         log.info("Setting users >> ");
         users = new ArrayList<>();
         List<JsonNode> l = UserManager.downloadUsers(token);
         for (JsonNode tmp : l) {
             final User user = new User(tmp);
+            log.info("USER model>>" + tmp.toPrettyString());
             users.add(user);
             // user.getModel().listStatements().forEachRemaining(st ->
             // model.add(st));
@@ -322,13 +302,11 @@ public class AuthDataModelBuilder {
         }
     }
 
-    private void setEndpoints(Model authMod)
-            throws ClientProtocolException, IOException {
+    private void setEndpoints(Model authMod) throws ClientProtocolException, IOException {
         log.info("Setting endpoints >> ");
         endpoints = new ArrayList<>();
         paths = new ArrayList<>();
-        final Triple t = new Triple(Node.ANY, RDF.type.asNode(),
-                RdfConstants.ENDPOINT.asNode());
+        final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.ENDPOINT.asNode());
         final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
         while (ext.hasNext()) {
             final String st = ext.next().getSubject().getURI();
@@ -338,11 +316,9 @@ public class AuthDataModelBuilder {
         }
     }
 
-    private void setResourceAccess(Model authMod)
-            throws ClientProtocolException, IOException {
+    private void setResourceAccess(Model authMod) throws ClientProtocolException, IOException {
         access = new ArrayList<>();
-        final Triple t = new Triple(Node.ANY, RDF.type.asNode(),
-                RdfConstants.RES_ACCESS.asNode());
+        final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.RES_ACCESS.asNode());
         final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
         while (ext.hasNext()) {
             final String st = ext.next().getSubject().getURI();
@@ -357,16 +333,13 @@ public class AuthDataModelBuilder {
 
     public static String patchUser(String auth0Id, String jsonPayload)
             throws ClientProtocolException, IOException, URISyntaxException {
-        HttpClient client = HttpClientBuilder.create().disableCookieManagement()
-                .build();
-        URI u = new URI(
-                auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
+        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
+        URI u = new URI(auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
         HttpPatch patch = new HttpPatch(u);
         // using getToken() : we need a special token to use auth0 api
         patch.addHeader("Authorization", "Bearer " + getToken());
         StringEntity se = new StringEntity(jsonPayload);
-        se.setContentType(
-                new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         patch.setEntity(se);
         HttpResponse resp = client.execute(patch);
         log.info("patchUser response >> {}", resp);
@@ -385,20 +358,17 @@ public class AuthDataModelBuilder {
 
     @Override
     public String toString() {
-        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles
-                + ", permissions=" + permissions + ", users=" + users
-                + ", endpoints=" + endpoints + ", access=" + access + ", apps="
-                + apps + ", paths=" + paths + ", model=" + model + "]";
+        return "AuthDataModelBuilder [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions
+                + ", users=" + users + ", endpoints=" + endpoints + ", access=" + access + ", apps=" + apps + ", paths="
+                + paths + ", model=" + model + "]";
     }
 
     public static void main(String... args)
-            throws ClientProtocolException, IOException, InterruptedException,
-            ExecutionException, URISyntaxException {
+            throws ClientProtocolException, IOException, InterruptedException, ExecutionException, URISyntaxException {
         Properties props = new Properties();
         InputStream is = null;
         try {
-            is = new FileInputStream(
-                    "/etc/buda/share/shared-private.properties");
+            is = new FileInputStream("/etc/buda/share/shared-private.properties");
         } catch (FileNotFoundException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();

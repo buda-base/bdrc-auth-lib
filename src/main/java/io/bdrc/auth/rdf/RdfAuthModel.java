@@ -13,10 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -171,9 +168,11 @@ public class RdfAuthModel implements Runnable {
 
     public static ArrayList<String> getGroupsIdByName(List<String> names) {
         ArrayList<String> groups = new ArrayList<>();
-        names.forEach(name -> {
-            groups.add(getGroupIdByName(name));
-        });
+        if (names != null) {
+            names.forEach(name -> {
+                groups.add(getGroupIdByName(name));
+            });
+        }
         return groups;
     }
 
@@ -218,9 +217,11 @@ public class RdfAuthModel implements Runnable {
 
     public static ArrayList<String> getRolesIdByName(List<String> names) {
         ArrayList<String> roles = new ArrayList<>();
-        names.forEach(name -> {
-            roles.add(getRoleIdByName(name));
-        });
+        if (names != null) {
+            names.forEach(name -> {
+                roles.add(getRoleIdByName(name));
+            });
+        }
         return roles;
     }
 
@@ -259,9 +260,11 @@ public class RdfAuthModel implements Runnable {
 
     public static ArrayList<String> getPermissionsIdByName(List<String> names) {
         ArrayList<String> perms = new ArrayList<>();
-        names.forEach(name -> {
-            perms.add(getPermissionIdByName(name));
-        });
+        if (names != null) {
+            names.forEach(name -> {
+                perms.add(getPermissionIdByName(name));
+            });
+        }
         return perms;
     }
 
@@ -478,21 +481,16 @@ public class RdfAuthModel implements Runnable {
         log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
         fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
         int timeout = 5;
-        RequestConfig config = RequestConfig.custom()
-          .setConnectTimeout(timeout * 1000)
-          .setConnectionRequestTimeout(timeout * 1000)
-          .setSocketTimeout(timeout * 1000).build();
-        CloseableHttpClient client = 
-          HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create()
-                .destination(fusekiUrlBase)
-                .queryEndpoint(fusekiUrlBase+"/query")
-                .gspEndpoint(fusekiUrlBase+"/data")
-                .updateEndpoint(fusekiUrlBase+"/update")
-                .httpClient(client);
+        RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+                .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrlBase)
+                .queryEndpoint(fusekiUrlBase + "/query").gspEndpoint(fusekiUrlBase + "/data")
+                .updateEndpoint(fusekiUrlBase + "/update").httpClient(client);
         RDFConnection fuConn = fuConnBuilder.build();
         final Model m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
         log.info("Got auth model");
+        m.write(System.out, "TURTLE");
         if (m != null) {
             resetModel(m);
             update(System.currentTimeMillis());
@@ -578,6 +576,9 @@ public class RdfAuthModel implements Runnable {
         // t.start();
         // AuthDataModelBuilder builder=new AuthDataModelBuilder();
         updateAuthData(null);
+        // RdfAuthModel.init();
+        System.out.println("ROLES >>" + getRoles());
+
     }
 
 }
