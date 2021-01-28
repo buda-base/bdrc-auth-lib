@@ -477,7 +477,7 @@ public class RdfAuthModel implements Runnable {
     // by the server (ldspdi) receiving callbacks from auth0 or bdrc-auth-lib
     // repo
     public static void readAuthModel() {
-        String fusekiUrlBase = AuthProps.getProperty("fusekiUrl");
+        String fusekiUrlBase = AuthProps.getProperty("fusekiAuthUrl");
         log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
         fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
         int timeout = 5;
