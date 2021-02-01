@@ -518,7 +518,7 @@ public class RdfAuthModel implements Runnable {
     public static void updateAuthData(String fusekiUrl) throws InterruptedException, ExecutionException {
         log.info("Updating auth data >> " + fusekiUrl);
         if (fusekiUrl == null) {
-            fusekiUrl = AuthProps.getProperty("fusekiAuthData");
+            fusekiUrl = AuthProps.getProperty("fusekiAuthUrl");
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
         log.info("Service fuseki >> " + fusekiUrl);

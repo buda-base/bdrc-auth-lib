@@ -2,6 +2,7 @@ package io.bdrc.auth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +48,24 @@ public class UserProfile {
         // these claim names come from the javascript rules defined in auth0
         // bdrc.io tenant dashboard
         log.debug("decodedJwt is {}", decodedJwt);
-        List<String> n_roles = decodedJwt.getClaims().get("https://auth.bdrc.io/roles").asList(String.class);
-        List<String> n_groups = decodedJwt.getClaims().get("https://auth.bdrc.io/groups").asList(String.class);
-        List<String> n_perms = decodedJwt.getClaims().get("https://auth.bdrc.io/permissions").asList(String.class);
-        String usrName = decodedJwt.getClaims().get("name").asString();
+        Map<String, Claim> claims = decodedJwt.getClaims();
+        List<String> n_roles = null;
+        List<String> n_groups = null;
+        List<String> n_perms = null;
+        if (claims.containsKey("https://auth.bdrc.io/roles")) {
+            n_roles = claims.get("https://auth.bdrc.io/roles").asList(String.class);
+        }
+        if (claims.containsKey("https://auth.bdrc.io/groups")) {
+            n_groups = claims.get("https://auth.bdrc.io/groups").asList(String.class);
+        }
+        if (claims.containsKey("https://auth.bdrc.io/permissions")) {
+            n_perms = claims.get("https://auth.bdrc.io/permissions").asList(String.class);
+        }
+        
+        String usrName = null;
+        if (claims.containsKey("name")) {
+            decodedJwt.getClaims().get("name").asString();
+        }
 
         final String id = getId(decodedJwt);
         log.debug("user id from decodedJwt is {}", id);
