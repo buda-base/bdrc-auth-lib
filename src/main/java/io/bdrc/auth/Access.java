@@ -182,6 +182,14 @@ public class Access {
                 }
             }
             log.info("User permissions {} DO NOT match ResourceAccess {} permission {} ", user.getPermissions(), access, access.getPermission());
+            ArrayList<String> groups = user.getGroups();
+            ArrayList<String> anyStatusGroups = RdfAuthModel.getAnyStatusGroup();
+            for (String s : groups) {
+                if (anyStatusGroups.contains(RdfConstants.AUTH_RESOURCE_BASE + s)) {
+                    log.info("User {} with groups {} can access {} ", user, groups, accessTypeLocalName);
+                    return true;
+                }
+            }
         }
         return false;
     }

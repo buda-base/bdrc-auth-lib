@@ -409,6 +409,7 @@ public class RdfAuthModel implements Runnable {
             String group = rs.getURI();
             boolean acc = rs.getProperty(RdfConstants.ANY_STATUS).getBoolean();
             if (acc) {
+                log.info("add group with any status from the policies: {}", anyStatusGroups);
                 anyStatusGroups.add(group);
             }
         }
