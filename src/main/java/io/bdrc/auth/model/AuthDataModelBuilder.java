@@ -294,7 +294,7 @@ public class AuthDataModelBuilder {
         List<JsonNode> l = UserManager.downloadUsers(token);
         for (JsonNode tmp : l) {
             final User user = new User(tmp);
-            log.info("USER model>>" + tmp.toPrettyString());
+            log.debug("USER model>>" + tmp.toString());
             users.add(user);
             // user.getModel().listStatements().forEachRemaining(st ->
             // model.add(st));
