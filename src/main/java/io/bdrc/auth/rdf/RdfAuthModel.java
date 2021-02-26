@@ -432,10 +432,13 @@ public class RdfAuthModel implements Runnable {
         while (it.hasNext()) {
             final Resource rs = it.next();
             final Application app = new Application();
-            app.setName(rs.getProperty(RDFS.label).getObject().toString());
+            Statement s = rs.getProperty(RDFS.label);
+            app.setName(s != null ? s.getObject().toString() : null);
             app.setAppId(getShortName(rs.getURI()));
-            app.setAppType(rs.getProperty(RdfConstants.APPTYPE).getObject().toString());
-            app.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
+            s = rs.getProperty(RdfConstants.APPTYPE);
+            app.setAppType(s != null ? s.getObject().toString() : null);
+            s = rs.getProperty(RdfConstants.DESC);
+            app.setDesc(s != null ? s.getObject().toString() : null);
             applications.add(app);
         }
         return applications;
