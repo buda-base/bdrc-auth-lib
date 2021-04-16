@@ -144,13 +144,13 @@ public class RdfAuthModel implements Runnable {
             while (sit.hasNext()) {
                 final Statement st = sit.next();
                 final String role = st.getObject().toString();
-                user.getRoles().add(getShortName(role));
+                //user.getRoles().add(getShortName(role));
             }
             sit = rs.listProperties(RdfConstants.FOR_GROUP);
             while (sit.hasNext()) {
                 final Statement st = sit.next();
                 final String gp = st.getObject().toString();
-                user.getGroups().add(getShortName(gp));
+                //user.getGroups().add(getShortName(gp));
             }
             users.put(getShortName(userId), user);
         }
@@ -502,7 +502,7 @@ public class RdfAuthModel implements Runnable {
 
     static void resetModel(final Model m) {
         authMod = m;
-        getUsers();
+        //getUsers();
         getGroups();
         getRoles();
         getPermissions();

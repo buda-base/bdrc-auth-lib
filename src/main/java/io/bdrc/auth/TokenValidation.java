@@ -50,7 +50,7 @@ public class TokenValidation {
                 user = new UserProfile(decodedJwt);
             } else {
                 user = new UserProfile();
-                log.warn("DecodedJwt is null for token {}", tokenStr);
+                log.error("DecodedJwt is null for token {}", tokenStr);
             }
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());

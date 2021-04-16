@@ -53,17 +53,11 @@ public class User {
     String lastLogin;
     BudaRdfUser budaUser;
     boolean blocked;
-    ArrayList<String> roles;
-    ArrayList<String> personalAccess;
-    ArrayList<String> groups;
     Model model;
 
     public final static Logger log = LoggerFactory.getLogger(User.class.getName());
 
     public User(final JsonNode json) throws JsonProcessingException {
-        if (roles == null) {
-            roles = new ArrayList<String>();
-        }
         long deb = System.currentTimeMillis();
         log.debug("Before creating User {}", deb);
         authId = getJsonValue(json, "user_id");
@@ -82,7 +76,6 @@ public class User {
                 blocked = true;
             }
         }
-        groups = new ArrayList<>();
         final JsonNode ids = json.findValue("identities");
         if (ids != null) {
             isSocial = getJsonValue(ids, "isSocial");
@@ -109,9 +102,6 @@ public class User {
         provider = "";
         connection = "";
         blocked = false;
-        roles = new ArrayList<>();
-        groups = new ArrayList<>();
-        personalAccess = new ArrayList<>();
         model = null;
         budaUser = null;
     }
@@ -133,9 +123,6 @@ public class User {
         if (budaUser != null) {
             res.add(usr, RdfConstants.BUDA_USER, ResourceFactory.createResource(budaUser.getBudaUserId()));
         }
-        for (String role : roles) {
-            res.add(usr, RdfConstants.HAS_ROLE, ResourceFactory.createResource(RdfConstants.AUTH_RESOURCE_BASE + role));
-        }
         return res;
     }
 
@@ -153,10 +140,6 @@ public class User {
 
     public void setBudaUser(BudaRdfUser budaUser) {
         this.budaUser = budaUser;
-    }
-
-    public boolean isAdmin() {
-        return groups.contains(RdfAuthModel.adminGroupId);
     }
 
     public void setUserId(String userId) {
@@ -185,14 +168,6 @@ public class User {
 
     public void setConnection(String connection) {
         this.connection = connection;
-    }
-
-    public ArrayList<String> getRoles() {
-        return roles;
-    }
-
-    public ArrayList<String> getGroups() {
-        return groups;
     }
 
     public String getIsSocial() {
@@ -231,10 +206,6 @@ public class User {
         return blocked;
     }
 
-    public ArrayList<String> getPersonalAccess() {
-        return personalAccess;
-    }
-
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }
@@ -243,8 +214,7 @@ public class User {
     public String toString() {
         return "User [userId=" + userId + ", authId=" + authId + ", name=" + name + ", email=" + email + ", isSocial="
                 + isSocial + ", provider=" + provider + ", connection=" + connection + ", budaUser=" + budaUser
-                + ", blocked=" + blocked + ", roles=" + roles + ", personalAccess=" + personalAccess + ", groups="
-                + groups + ", model=" + model + "]";
+                + ", blocked=" + blocked + ", model=" + model + "]";
     }
 
 }

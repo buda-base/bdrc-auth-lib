@@ -72,7 +72,6 @@ public class UserProfile {
         log.debug("user groups from decodedJwt is {}", n_groups);
         log.debug("user permissions from decodedJwt is {}", n_perms);
         log.debug("user found for id {} in authModel is {}", id, user);
-        log.debug("users in RdfAuthModel {} ", RdfAuthModel.getUsers());
         this.user = new User();
         /**
          * lets keep this commented here as it shows "the old way" to get
@@ -108,6 +107,10 @@ public class UserProfile {
         this.permissions = new ArrayList<>();
         this.name = "";
         this.user = new User();
+    }
+    
+    public boolean isAdmin() {
+        return groups.contains(RdfAuthModel.adminGroupId);
     }
 
     public ArrayList<String> getGroups() {

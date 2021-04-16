@@ -197,6 +197,10 @@ public class Access {
     public User getUser() {
         return this.user.getUser();
     }
+    
+    public UserProfile getUserProfile() {
+        return this.user;
+    }
 
     @Override
     public String toString() {
