@@ -38,8 +38,8 @@ public class UserProfile {
     ArrayList<String> groups;
     ArrayList<String> roles;
     ArrayList<String> permissions;
-    String name;
-    User user;
+    String name = null;
+    User user = null;
 
     public final static Logger log = LoggerFactory.getLogger(UserProfile.class.getName());
 
@@ -61,60 +61,45 @@ public class UserProfile {
         if (claims.containsKey("https://auth.bdrc.io/permissions")) {
             n_perms = claims.get("https://auth.bdrc.io/permissions").asList(String.class);
         }
-        
-        String usrName = null;
-        if (claims.containsKey("name")) {
-            decodedJwt.getClaims().get("name").asString();
-        }
 
         final String id = getId(decodedJwt);
+        if (id == null) {
+            
+        }
+        
         log.debug("user id from decodedJwt is {}", id);
         log.debug("user roles from decodedJwt is {}", n_roles);
         log.debug("user groups from decodedJwt is {}", n_groups);
         log.debug("user permissions from decodedJwt is {}", n_perms);
-        log.debug("user name from decodedJwt is {}", usrName);
         log.debug("user found for id {} in authModel is {}", id, user);
         log.debug("users in RdfAuthModel {} ", RdfAuthModel.getUsers());
-
-        if (id != null) {
-            this.user = new User();
-            /**
-             * lets keep this commented here as it shows "the old way" to get
-             * credentials (groups, roles, permissions) from the loaded
-             * RDFAuthModel
-             ***/
-            // this.groups = RdfAuthModel.getUser(id).getGroups();
-            // this.roles = RdfAuthModel.getUser(id).getRoles();
-            // this.permissions = RdfAuthModel.getPermissions(roles, groups);
-            /**
-             * New way of getting groups, roles and permissions, i.e from the
-             * token, so any change to a user credentials applies in real time
-             * (after logout/login back) Therefore, for instance, if a user is
-             * added to an existing group, then this change applies immediately
-             * after logout/login back. NOTE: keep in mind that changes made to
-             * the groups, roles or permissions themselves are not reflected
-             * here in real time When such changes occur, RDFAuthModel must be
-             * rebuilt and updated using the relevant webhook on ldspdi.
-             **/
-            this.groups = RdfAuthModel.getGroupsIdByName(n_groups);
-            this.roles = RdfAuthModel.getRolesIdByName(n_roles);
-            this.permissions = RdfAuthModel.getPermissionsIdByName(n_perms);
-            log.debug("user permissions from AuthModel is {}", permissions);
-            this.name = usrName;
-
-        } else {
-            this.user = new User();
-            this.groups = new ArrayList<>();
-            this.roles = new ArrayList<>();
-            this.permissions = new ArrayList<>();
-            // by default email and name are the same
-            // auth0 requires email for registration, both in dashboard and on
-            // register page
-            this.user.setName(getName(decodedJwt));
-            this.user.setEmail(getName(decodedJwt));
-            this.user.setUserId(getId(decodedJwt));
-            this.user.setAuthId(getAuth0Id(decodedJwt));
-        }
+        this.user = new User();
+        /**
+         * lets keep this commented here as it shows "the old way" to get
+         * credentials (groups, roles, permissions) from the loaded
+         * RDFAuthModel
+         ***/
+        // this.groups = RdfAuthModel.getUser(id).getGroups();
+        // this.roles = RdfAuthModel.getUser(id).getRoles();
+        // this.permissions = RdfAuthModel.getPermissions(roles, groups);
+        /**
+         * New way of getting groups, roles and permissions, i.e from the
+         * token, so any change to a user credentials applies in real time
+         * (after logout/login back) Therefore, for instance, if a user is
+         * added to an existing group, then this change applies immediately
+         * after logout/login back. NOTE: keep in mind that changes made to
+         * the groups, roles or permissions themselves are not reflected
+         * here in real time When such changes occur, RDFAuthModel must be
+         * rebuilt and updated using the relevant webhook on ldspdi.
+         **/
+        this.groups = RdfAuthModel.getGroupsIdByName(n_groups);
+        this.roles = RdfAuthModel.getRolesIdByName(n_roles);
+        this.permissions = RdfAuthModel.getPermissionsIdByName(n_perms);
+        this.name = getName(decodedJwt);
+        this.user.setName(getName(decodedJwt));
+        this.user.setEmail(getEmail(decodedJwt));
+        this.user.setUserId(getId(decodedJwt));
+        this.user.setAuthId(getAuth0Id(decodedJwt));
     }
 
     public UserProfile() {
@@ -135,32 +120,35 @@ public class UserProfile {
 
     String getName(final DecodedJWT decodedJwt) {
         final Claim claim = decodedJwt.getClaims().get("name");
-        if (claim != null) {
+        if (claim != null && !claim.asString().contains("@")) {
             return claim.asString();
         }
         return null;
     }
 
-    String getId(final DecodedJWT decodedJwt) {
-        final Claim claim = decodedJwt.getClaims().get("sub");
-        if (claim != null) {
-            final String id = claim.asString();
-            if (!id.endsWith("@clients")) {
-                return id.substring(id.indexOf("|") + 1);
-            }
+    String getEmail(final DecodedJWT decodedJwt) {
+        // get the email if it's the name
+        final Claim claim = decodedJwt.getClaims().get("name");
+        if (claim != null && claim.asString().contains("@")) {
+            return claim.asString();
         }
-        return "";
+        return null;
+    }
+    
+    String getId(final DecodedJWT decodedJwt) {
+        final String sub = decodedJwt.getSubject();
+        if (sub != null && !sub.endsWith("@clients")) {
+            return sub.substring(sub.indexOf("|") + 1);
+        }
+        return null;
     }
 
     String getAuth0Id(final DecodedJWT decodedJwt) {
-        final Claim claim = decodedJwt.getClaims().get("sub");
-        if (claim != null) {
-            final String id = claim.asString();
-            if (!id.endsWith("@clients")) {
-                return id;
-            }
+        final String sub = decodedJwt.getSubject();
+        if (sub != null && !sub.endsWith("@clients")) {
+            return sub;
         }
-        return "";
+        return null;
     }
 
     public ArrayList<String> getPermissions() {
@@ -185,6 +173,6 @@ public class UserProfile {
 
     @Override
     public String toString() {
-        return "User [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";
+        return "UserProfile [groups=" + groups + ", roles=" + roles + ", permissions=" + permissions + ", name=" + name + "]";
     }
 }
