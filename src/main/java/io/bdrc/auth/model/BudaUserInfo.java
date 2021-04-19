@@ -23,8 +23,9 @@ public class BudaUserInfo {
     public final static Logger log = LoggerFactory.getLogger(BudaUserInfo.class.getName());
     private static Model USERS;
 
-    static {
+    public static void init() {
         String fusekiUrl = AuthProps.getProperty("fusekiAuthData");
+        log.info("initialize BudaUserInfo with Fuseki URL {}", fusekiUrl);
         USERS = ModelFactory.createDefaultModel();
         String query = "construct {  " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL
                 + "> ?label. } " + "where { " + "{ " + "?s ?p ?o. ?s a <" + BDOU_PFX + "User>. " + "?s <" + BDOU_PFX

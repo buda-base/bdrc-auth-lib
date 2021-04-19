@@ -5,6 +5,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.model.BudaUserInfo;
+
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
  *
@@ -33,6 +35,7 @@ public class AuthProps {
 
     public static void init(Properties props) {
         authProps = props;
+        BudaUserInfo.init();
     }
 
     public static boolean hasProps() {

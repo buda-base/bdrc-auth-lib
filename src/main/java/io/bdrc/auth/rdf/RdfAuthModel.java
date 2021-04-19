@@ -121,7 +121,6 @@ public class RdfAuthModel implements Runnable {
     }
 
     public static HashMap<String, User> getUsers() {
-
         if (users != null) {
             return users;
         }
@@ -140,18 +139,6 @@ public class RdfAuthModel implements Runnable {
             user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
             user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
             user.setBudaUser(BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1)));
-            StmtIterator sit = rs.listProperties(RdfConstants.HAS_ROLE);
-            while (sit.hasNext()) {
-                final Statement st = sit.next();
-                final String role = st.getObject().toString();
-                //user.getRoles().add(getShortName(role));
-            }
-            sit = rs.listProperties(RdfConstants.FOR_GROUP);
-            while (sit.hasNext()) {
-                final Statement st = sit.next();
-                final String gp = st.getObject().toString();
-                //user.getGroups().add(getShortName(gp));
-            }
             users.put(getShortName(userId), user);
         }
         return users;
