@@ -387,7 +387,7 @@ public class AuthDataModelBuilder {
             e.printStackTrace();
         }
         /* END OF CODE TO REMOVE **********/
-        AuthDataModelBuilder builder = new AuthDataModelBuilder();
+        //AuthDataModelBuilder builder = new AuthDataModelBuilder();
         /*
          * System.out.println("RÔLES >> " + builder.roles);
          * 
