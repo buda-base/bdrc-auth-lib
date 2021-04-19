@@ -42,43 +42,9 @@ public class UserManager {
 	public final static Logger log = LoggerFactory
 			.getLogger(UserManager.class.getName());
 
-	static AuthAPI auth;
-	static String token;
-	final static JWTVerifier verifier;
-
 	public static HashMap<String, String> connectionsType;
 	public static HashMap<String, ConnectionJob> connectionsJobs = new HashMap<>();
 
-	static {
-		/* CODE TO BE REMOVED ALONG WITH THE MAIN METHOD **/
-		Properties props = new Properties();
-		InputStream is = null;
-		try {
-			is = new FileInputStream(
-					"/etc/buda/share/shared-private.properties");
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			props.load(is);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		AuthProps.init(props);
-		try {
-			is.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		/* END OF CODE TO REMOVE **********/
-		auth = new AuthAPI("bdrc-io.auth0.com",
-				AuthProps.getProperty("apiClientId"),
-				AuthProps.getProperty("apiClientSecret"));
-		verifier = BdrcJwks.verifier;
-	}
 
 	/**
 	 * get the map of all connections name-id pairs

@@ -25,7 +25,7 @@ public class BudaUserInfo {
 
     public static void init() {
         String fusekiUrl = AuthProps.getProperty("fusekiAuthData");
-        log.error("initialize BudaUserInfo with Fuseki URL {}", fusekiUrl);
+        log.info("initialize BudaUserInfo with Fuseki URL {}", fusekiUrl);
         USERS = ModelFactory.createDefaultModel();
         String query = "construct {  " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL
                 + "> ?label. } " + "where { " + "{ " + "?s ?p ?o. ?s a <" + BDOU_PFX + "User>. " + "?s <" + BDOU_PFX
