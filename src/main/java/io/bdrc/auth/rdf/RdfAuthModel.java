@@ -61,7 +61,7 @@ import io.bdrc.auth.model.User;
  * limitations under the License.
  ******************************************************************************/
 
-public class RdfAuthModel implements Runnable {
+public class RdfAuthModel {
 
     static Model authMod;
     static HashMap<String, User> users;
@@ -532,16 +532,6 @@ public class RdfAuthModel implements Runnable {
         return st.substring(st.lastIndexOf("/") + 1);
     }
 
-    @Override
-    public void run() {
-        try {
-            updateAuthData(null);
-        } catch (Exception e) {
-            log.error("Running error", e);
-        }
-        log.info("Done loading and updating rdfAuth Model");
-    }
-
     public static void main(String[] args)
             throws ClientProtocolException, IOException, InterruptedException, ExecutionException {
         // Properties props = new Properties();
@@ -565,7 +555,7 @@ public class RdfAuthModel implements Runnable {
         // Thread t = new Thread(new RdfAuthModel());
         // t.start();
         // AuthDataModelBuilder builder=new AuthDataModelBuilder();
-        updateAuthData(null);
+        //updateAuthData(null);
         // RdfAuthModel.init();
     }
 
