@@ -26,6 +26,21 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class RdfConstants {
 
+    public static String queryPrefixStr = "prefix :      <http://purl.bdrc.io/ontology/core/>\n" + 
+            "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n" + 
+            "prefix bdr:   <http://purl.bdrc.io/resource/>\n" + 
+            "prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/>\n" + 
+            "prefix adr:   <http://purl.bdrc.io/resource-auth/>\n" + 
+            "prefix foaf:  <http://xmlns.com/foaf/0.1/>\n" + 
+            "prefix owl:   <http://www.w3.org/2002/07/owl#>\n" + 
+            "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
+            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" + 
+            "prefix skos:  <http://www.w3.org/2004/02/skos/core#>\n" + 
+            "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" + 
+            "prefix bdg:   <http://purl.bdrc.io/graph/>\n" + 
+            "prefix bda:   <http://purl.bdrc.io/admindata/>\n" + 
+            "prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> \n" + 
+            "prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> \n";    
     public static final String AUTH_RESOURCE_BASE = "http://purl.bdrc.io/resource-nc/auth/";
     public static final String AUTH_VOC_BASE = "http://purl.bdrc.io/ontology/ext/auth/";
     public static final Resource APPLICATION = ResourceFactory.createResource(AUTH_VOC_BASE + "Application");

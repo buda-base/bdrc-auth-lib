@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.bdrc.auth.AuthProps;
+import io.bdrc.auth.rdf.RdfConstants;
 
 public class BudaUserInfo {
 
@@ -27,7 +28,7 @@ public class BudaUserInfo {
         String fusekiUrl = AuthProps.getProperty("fusekiAuthData");
         log.info("initialize BudaUserInfo with Fuseki URL {}", fusekiUrl);
         USERS = ModelFactory.createDefaultModel();
-        String query = "construct {  " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL
+        String query = RdfConstants.queryPrefixStr+"construct {  " + "?s <" + BDOU_PFX + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL
                 + "> ?label. } " + "where { " + "{ " + "?s ?p ?o. ?s a <" + BDOU_PFX + "User>. " + "?s <" + BDOU_PFX
                 + "hasUserProfile> ?pr. " + "?s <" + SKOS_PREF_LABEL + "> ?label. " + "}" + "}";
         RDFConnection conn = RDFConnectionRemote.create().destination(fusekiUrl).build();
