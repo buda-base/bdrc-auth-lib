@@ -30,7 +30,7 @@ public class RdfConstants {
             "prefix adm:   <http://purl.bdrc.io/ontology/admin/>\n" + 
             "prefix bdr:   <http://purl.bdrc.io/resource/>\n" + 
             "prefix aut:   <http://purl.bdrc.io/ontology/ext/auth/>\n" + 
-            "prefix adr:   <http://purl.bdrc.io/resource-auth/>\n" + 
+            "prefix adrr:   <http://purl.bdrc.io/resource-auth/>\n" + 
             "prefix foaf:  <http://xmlns.com/foaf/0.1/>\n" + 
             "prefix owl:   <http://www.w3.org/2002/07/owl#>\n" + 
             "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
@@ -40,6 +40,7 @@ public class RdfConstants {
             "prefix bdg:   <http://purl.bdrc.io/graph/>\n" + 
             "prefix bda:   <http://purl.bdrc.io/admindata/>\n" + 
             "prefix bdu:   <http://purl.bdrc.io/resource-nc/user/> \n" + 
+            "prefix adr:   <http://purl.bdrc.io/resource-nc/auth/> \n" +
             "prefix bdou:  <http://purl.bdrc.io/ontology/ext/user/> \n";    
     public static final String AUTH_RESOURCE_BASE = "http://purl.bdrc.io/resource-nc/auth/";
     public static final String AUTH_VOC_BASE = "http://purl.bdrc.io/ontology/ext/auth/";
