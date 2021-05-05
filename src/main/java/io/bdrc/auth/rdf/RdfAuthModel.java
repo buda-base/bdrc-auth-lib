@@ -460,7 +460,7 @@ public class RdfAuthModel {
         }
         return null;
     }
-
+    
     // Loads the model from fuseki -
     // Used by any application using bdrc-auth-lib
     // The model will then be updated (by ModelUpdate timer)
@@ -521,8 +521,7 @@ public class RdfAuthModel {
             rvf.close();
             resetModel(auth.getModel());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("", e);
         }
         Thread t = new Thread(new ModelUpdate());
         t.start();
