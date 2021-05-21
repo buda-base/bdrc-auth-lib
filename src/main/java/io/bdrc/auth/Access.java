@@ -35,23 +35,31 @@ public class Access {
 
     final UserProfile user;
     final Endpoint endpoint;
+    final boolean isLogged;
 
     public final static Logger log = LoggerFactory.getLogger(Access.class.getName());
 
     public static enum AccessLevel {
         OPEN, FAIR_USE, MIXED, NOACCESS
     }
+    
+    public static enum AccessRequest {
+        IMAGE, PDF, ETEXT
+    }
 
     public Access(final UserProfile user, final Endpoint endpoint) {
         super();
         this.user = user;
         this.endpoint = endpoint;
+        this.isLogged = true;
         log.info("Initialized Access with User {}", user);
     }
 
     public Access() {
+        // default access for non-logged in users
         this.user = new UserProfile();
         this.endpoint = new Endpoint();
+        this.isLogged = false;
         log.info("Initialized Access with default empty user and endpoint");
     }
 
@@ -75,7 +83,44 @@ public class Access {
         return !getUser().getUserId().equals("");
     }
 
-    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
+    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final AccessRequest ar, final String ipAddress) {
+        if (ar == AccessRequest.IMAGE) {
+            return hasResourceSimpleAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri);
+        }
+        return hasResourcePDFAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri, ipAddress);
+    }
+    
+    public AccessLevel hasResourceSimpleAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
+        // for accesShortName AccessFairUse and StatusReleased, access level is OPEN
+        if (!canUserAccessStatus(resourceStatusLocalName)) {
+            if (canUserAccessResource(resourceUri)) {
+                return AccessLevel.OPEN;
+            }
+            return AccessLevel.NOACCESS;
+        }
+        if (RdfConstants.OPEN.equals(resourceAccessLocalName)) {
+            return AccessLevel.OPEN;
+        }
+        final ResourceAccess access = RdfAuthModel.getResourceAccess(resourceAccessLocalName);
+        if (access != null) {
+            final String accessPermission = access.getPermission();
+            if (user.hasPermission(accessPermission)) {
+                return AccessLevel.OPEN;
+            }
+        }
+        if (canUserAccessResource(resourceUri)) {
+            return AccessLevel.OPEN;
+        }
+        if (RdfConstants.FAIR_USE.equals(resourceAccessLocalName)) {
+            return AccessLevel.FAIR_USE;
+        }
+        if (RdfConstants.MIXED.equals(resourceAccessLocalName)) {
+            return AccessLevel.MIXED;
+        }
+        return AccessLevel.NOACCESS;
+    }
+    
+    public AccessLevel hasResourcePDFAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final String ipAddress) {
         // for accesShortName AccessFairUse and StatusReleased, access level is OPEN
         if (!canUserAccessStatus(resourceStatusLocalName)) {
             if (canUserAccessResource(resourceUri)) {
