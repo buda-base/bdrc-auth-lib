@@ -1,6 +1,7 @@
 package io.bdrc.auth;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import io.bdrc.auth.model.ResourceAccess;
 import io.bdrc.auth.model.User;
 import io.bdrc.auth.rdf.RdfAuthModel;
 import io.bdrc.auth.rdf.RdfConstants;
+import io.bdrc.auth.rdf.Subscribers;
 
 /*******************************************************************************
  * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
@@ -82,15 +84,8 @@ public class Access {
     public boolean isUserLoggedIn() {
         return !getUser().getUserId().equals("");
     }
-
-    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final AccessRequest ar, final String ipAddress) {
-        if (ar == AccessRequest.IMAGE) {
-            return hasResourceSimpleAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri);
-        }
-        return hasResourcePDFAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri, ipAddress);
-    }
     
-    public AccessLevel hasResourceSimpleAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
+    public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
         // for accesShortName AccessFairUse and StatusReleased, access level is OPEN
         if (!canUserAccessStatus(resourceStatusLocalName)) {
             if (canUserAccessResource(resourceUri)) {
@@ -120,34 +115,16 @@ public class Access {
         return AccessLevel.NOACCESS;
     }
     
-    public AccessLevel hasResourcePDFAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final String ipAddress) {
-        // for accesShortName AccessFairUse and StatusReleased, access level is OPEN
-        if (!canUserAccessStatus(resourceStatusLocalName)) {
-            if (canUserAccessResource(resourceUri)) {
-                return AccessLevel.OPEN;
-            }
-            return AccessLevel.NOACCESS;
-        }
-        if (RdfConstants.OPEN.equals(resourceAccessLocalName)) {
-            return AccessLevel.OPEN;
-        }
-        final ResourceAccess access = RdfAuthModel.getResourceAccess(resourceAccessLocalName);
-        if (access != null) {
-            final String accessPermission = access.getPermission();
-            if (user.hasPermission(accessPermission)) {
-                return AccessLevel.OPEN;
+    public AccessLevel hasResourcePDFAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final String ipAddress, final List<String> collections) {
+        // if the user is not logged, the user must have access to the work through their institution:
+        if (!this.isLogged) {
+            if (Subscribers.ipSubcribesTo(ipAddress, collections)) {
+                return hasResourceAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri);
+            } else {
+                return AccessLevel.NOACCESS;
             }
         }
-        if (canUserAccessResource(resourceUri)) {
-            return AccessLevel.OPEN;
-        }
-        if (RdfConstants.FAIR_USE.equals(resourceAccessLocalName)) {
-            return AccessLevel.FAIR_USE;
-        }
-        if (RdfConstants.MIXED.equals(resourceAccessLocalName)) {
-            return AccessLevel.MIXED;
-        }
-        return AccessLevel.NOACCESS;
+        return hasResourceAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri);
     }
 
     public boolean canUserAccessStatus(final String resourceStatusLocalName) {

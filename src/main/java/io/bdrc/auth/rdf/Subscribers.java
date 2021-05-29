@@ -113,7 +113,7 @@ public class Subscribers {
     
     public static class NoIPCache implements IPCache {
         @Override
-        public String getSubscriber(String ip, Loader loader) throws IOException {
+        public String getSubscriber(final String ip, final Loader loader) throws IOException {
           return loader.loadSubscriber(ip);  
         }
     }
@@ -124,7 +124,7 @@ public class Subscribers {
         cache = c;
     }
     
-    public static String getCachedSubscriber(String ipStr) {
+    public static String getCachedSubscriber(final String ipStr) {
         try {
             return cache.getSubscriber(ipStr, loader);
         } catch (IOException e) {
@@ -133,11 +133,13 @@ public class Subscribers {
         }
     }
     
-    public static boolean collectionHasSubscriptions(String collectionLname) {
+    public static boolean collectionHasSubscriptions(final String collectionLname) {
         return collectionToSubscribers.containsKey(collectionLname);
     }
     
-    public static boolean ipSubcribesTo(String ipAddress, List<String> collections) {
+    public static boolean ipSubcribesTo(final String ipAddress, final List<String> collections) {
+        if (collections == null || collections.size() == 0)
+            return false;
         boolean subscriptionsRelevant = false;
         for (final String collection : collections) {
             if (collectionHasSubscriptions(collection)) {
