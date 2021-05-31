@@ -138,7 +138,7 @@ public class Subscribers {
     }
     
     public static boolean ipSubcribesTo(final String ipAddress, final List<String> collections) {
-        if (collections == null || collections.size() == 0)
+        if (collections == null || collections.size() == 0 || collectionToSubscribers == null)
             return false;
         boolean subscriptionsRelevant = false;
         for (final String collection : collections) {
