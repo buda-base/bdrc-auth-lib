@@ -153,7 +153,7 @@ public class Subscribers {
         final String subscriber = getCachedSubscriber(ipAddress);
         for (final String collection : collections) {
             final List<String> subscribers = collectionToSubscribers.get(collection);
-            if (subscribers.contains(subscriber)) {
+            if (subscribers != null && subscribers.contains(subscriber)) {
                 return true;
             }
         }
