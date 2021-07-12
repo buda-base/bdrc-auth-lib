@@ -198,9 +198,9 @@ public class UserManager {
 			throws IOException, InterruptedException {
 		UserManager.initConnectionJobs(token);
 		UserManager.pendingJobs();
-		System.out.println("Preparing jobs >>");
+		log.info("Preparing jobs >>");
 		UserManager.prepareJobs(token);
-		System.out.println(
+		log.info(
 				"Done preparing jobs >> {}" + UserManager.getConnectionJobs());
 		ObjectMapper mapper = new ObjectMapper();
 		List<JsonNode> nodes = new ArrayList<>();

@@ -111,9 +111,12 @@ public class User {
                 .createResource(RdfConstants.AUTH_RESOURCE_BASE + authId.split(Pattern.quote("|"))[1]);
         final Model res = ModelFactory.createDefaultModel();
         res.add(usr, RDF.type, RdfConstants.USER);
-        res.add(usr, RdfConstants.IS_SOCIAL, ResourceFactory.createStringLiteral(isSocial));
-        res.add(usr, RdfConstants.PROVIDER, ResourceFactory.createStringLiteral(provider));
-        res.add(usr, RdfConstants.CONNECTION, ResourceFactory.createStringLiteral(connection));
+        if (!isSocial.isEmpty())
+            res.add(usr, RdfConstants.IS_SOCIAL, ResourceFactory.createStringLiteral(isSocial));
+        if (!provider.isEmpty())
+            res.add(usr, RdfConstants.PROVIDER, ResourceFactory.createStringLiteral(provider));
+        if (!connection.isEmpty())
+            res.add(usr, RdfConstants.CONNECTION, ResourceFactory.createStringLiteral(connection));
         res.add(usr, FOAF.name, ResourceFactory.createStringLiteral(name));
         res.add(usr, RdfConstants.AUTHID, ResourceFactory.createStringLiteral(authId));
         res.add(usr, FOAF.mbox, ResourceFactory.createStringLiteral(email));

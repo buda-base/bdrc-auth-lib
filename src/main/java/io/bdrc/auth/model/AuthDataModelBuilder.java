@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,13 +20,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
@@ -65,6 +62,10 @@ import io.bdrc.auth.rdf.RdfConstants;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+
+/*
+ * Builds auth model from auth0 and the policies repository
+ */
 
 public class AuthDataModelBuilder {
 
@@ -152,28 +153,6 @@ public class AuthDataModelBuilder {
         setUsers(token2);
         setApps(token2);
         setUsersRolesMap();
-    }
-
-    public static String getToken() throws IOException {
-        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
-        HttpPost post = null;
-        post = new HttpPost(AuthProps.getProperty("auth0BaseUrl") + "oauth/token");
-        HashMap<String, String> json = new HashMap<>();
-        json.put("grant_type", "client_credentials");
-        json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
-        json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience", "https://bdrc-io.auth0.com/api/v2/");
-        String post_data = mapper.writer().writeValueAsString(json);
-        StringEntity se = new StringEntity(post_data);
-        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        post.setEntity(se);
-        HttpResponse response = client.execute(post);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        response.getEntity().writeTo(baos);
-        String json_resp = baos.toString();
-        baos.close();
-        JsonNode node = mapper.readTree(json_resp);
-        return node.findValue("access_token").asText();
     }
 
     private void setApps(final String token) throws ClientProtocolException, IOException {
@@ -329,23 +308,6 @@ public class AuthDataModelBuilder {
 
     public Model getModel() {
         return model;
-    }
-
-    public static String patchUser(String auth0Id, String jsonPayload)
-            throws ClientProtocolException, IOException, URISyntaxException {
-        HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
-        URI u = new URI(auth0BaseUrl + "api/v2/users/" + auth0Id.replace("|", "%7C"));
-        HttpPatch patch = new HttpPatch(u);
-        // using getToken() : we need a special token to use auth0 api
-        patch.addHeader("Authorization", "Bearer " + getToken());
-        StringEntity se = new StringEntity(jsonPayload);
-        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        patch.setEntity(se);
-        HttpResponse resp = client.execute(patch);
-        log.info("patchUser response >> {}", resp);
-        String rp = EntityUtils.toString(resp.getEntity());
-        log.info("patchUser response content >> {}", rp);
-        return rp;
     }
 
     final String getJsonValue(final JsonNode json, final String key) {
