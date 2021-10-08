@@ -34,6 +34,10 @@ import io.bdrc.auth.AuthProps;
  * limitations under the License.
  ******************************************************************************/
 
+/*
+ * A simple class to tell some subscribers that the model has been updated on Fuseki
+ * Typically used from editserv or ldspdi to tell iiif and iiifpres to update their data
+ */
 public class ModelUpdate implements Runnable {
 
     public final static Logger log = LoggerFactory.getLogger(ModelUpdate.class.getName());

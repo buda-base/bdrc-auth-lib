@@ -60,7 +60,10 @@ import io.bdrc.auth.model.User;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
+/*
+ * A class mirroring (almost) everything from auth0, built from the model on Fuseki
+ * (that is in turn built elsewhere, in AuthDataModelBuilder)
+ */
 public class RdfAuthModel {
 
     static Model authMod;
@@ -133,11 +136,14 @@ public class RdfAuthModel {
             user.setAuthId(authId);
             user.setName(rs.getProperty(FOAF.name).getObject().toString());
             user.setEmail(rs.getProperty(FOAF.mbox).getObject().toString());
-            user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject().toString());
+            if (rs.hasProperty(RdfConstants.IS_SOCIAL))
+                user.setIsSocial(rs.getProperty(RdfConstants.IS_SOCIAL).getObject().toString());
             final String userId = rs.getURI();
             user.setUserId(getShortName(userId));
-            user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
-            user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
+            if (rs.hasProperty(RdfConstants.PROVIDER))
+                user.setProvider(rs.getProperty(RdfConstants.PROVIDER).getObject().toString());
+            if (rs.hasProperty(RdfConstants.CONNECTION))
+                user.setConnection(rs.getProperty(RdfConstants.CONNECTION).getObject().toString());
             user.setBudaUser(BudaUserInfo.getBudaRdfInfo(authId.substring(authId.lastIndexOf("|") + 1)));
             users.put(getShortName(userId), user);
         }
@@ -346,7 +352,7 @@ public class RdfAuthModel {
     }
 
     public static ArrayList<ResourceAccess> getResourceAccess() {
-        if (access != null) {
+        if (access != null || authMod == null) {
             return access;
         }
         access = new ArrayList<>();
@@ -449,9 +455,10 @@ public class RdfAuthModel {
     }
 
     public static ResourceAccess getResourceAccess(final String accessType) {
-        if (access == null) {
+        if (access == null)
             access = getResourceAccess();
-        }
+        if (access == null)
+            return null;
         for (final ResourceAccess acc : access) {
             final String policy = acc.getPolicy();
             if (policy.equals(accessType)) {
