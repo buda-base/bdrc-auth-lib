@@ -117,7 +117,7 @@ public class Access {
     
     public AccessLevel hasResourcePDFAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final String ipAddress, final List<String> collections) {
         // if the user is not logged, the user must have access to the work through their institution:
-        if (!this.isLogged) {
+        if (AuthProps.authEnabled && !this.isLogged) {
             if (Subscribers.ipSubcribesTo(ipAddress, collections)) {
                 return hasResourceAccess(resourceAccessLocalName, resourceStatusLocalName, resourceUri);
             } else {

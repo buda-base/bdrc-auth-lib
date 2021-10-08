@@ -30,13 +30,17 @@ import io.bdrc.auth.model.BudaUserInfo;
 public class AuthProps {
 
     static Properties authProps = null;
+    static boolean authEnabled = true;
 
     public final static Logger log = LoggerFactory.getLogger(AuthProps.class.getName());
 
     public static void init(Properties props) {
         authProps = props;
-        if ("true".equals(props.getProperty("authEnabled")))
+        if (!"false".equals(props.getProperty("authEnabled"))) {
             BudaUserInfo.init();
+        } else {
+            authEnabled = false;
+        }
     }
 
     public static boolean hasProps() {
