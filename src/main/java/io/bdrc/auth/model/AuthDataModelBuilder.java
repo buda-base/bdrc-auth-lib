@@ -31,6 +31,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.riot.RiotException;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
@@ -102,7 +103,11 @@ public class AuthDataModelBuilder {
                 .openConnection();
         InputStream stream = connection.getInputStream();
         final Model authMod = ModelFactory.createDefaultModel();
-        authMod.read(stream, "", "TURTLE");
+        try {
+            authMod.read(stream, "", "TURTLE");
+        } catch (RiotException e) {
+            log.error("error reading "+AuthProps.getProperty("policiesUrl"), e);
+        }
         stream.close();
         HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
