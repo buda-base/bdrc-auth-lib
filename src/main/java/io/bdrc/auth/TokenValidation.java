@@ -111,6 +111,8 @@ public class TokenValidation {
     }
 
     public boolean checkTokenSignature() {
+        if (BdrcJwks.verifier == null)
+            return false;
         try {
             final JWTVerifier verifier = BdrcJwks.verifier;
             this.decodedJwt = verifier.verify(tokenStr);
