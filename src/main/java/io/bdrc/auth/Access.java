@@ -149,10 +149,10 @@ public class Access {
         log.info("User {} has personnal access {}", user, personalAccess);
         if (personalAccess != null) {
             boolean acc = personalAccess.contains(resourceUri);
-            log.error("User {} has personnal access to {}  ? {}", user, resourceUri, acc);
+            log.info("User {} has personnal access to {}  ? {}", user, resourceUri, acc);
             return acc;
         }
-        log.error("User {} cannot access resource {} ", user, resourceUri);
+        log.info("User {} cannot access resource {} ", user, resourceUri);
         return false;
     }
 
