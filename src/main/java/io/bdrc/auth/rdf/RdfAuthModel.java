@@ -16,6 +16,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -375,18 +376,17 @@ public class RdfAuthModel {
             return personalAccess;
         }
         personalAccess = new HashMap<>();
-        //
-        final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.PERSONAL_ACCESS);
+        final StmtIterator it = authMod.listStatements(null, RdfConstants.PERSONAL_ACCESS, (RDFNode) null);
         while (it.hasNext()) {
-            final Resource rs = it.next();
-            String user = rs.getURI();
-            String res = rs.getProperty(RdfConstants.PERSONAL_ACCESS).getObject().asResource().getURI();
-            ArrayList<String> access = personalAccess.get(user);
+            final Statement s = it.next();
+            String userURI = s.getSubject().getURI();
+            String res = s.getObject().asResource().getURI();
+            ArrayList<String> access = personalAccess.get(userURI);
             if (access == null) {
                 access = new ArrayList<>();
             }
             access.add(res);
-            personalAccess.put(user, access);
+            personalAccess.put(userURI, access);
         }
         return personalAccess;
     }
