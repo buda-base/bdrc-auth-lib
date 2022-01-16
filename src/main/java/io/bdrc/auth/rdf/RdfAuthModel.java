@@ -476,6 +476,10 @@ public class RdfAuthModel {
     // repo
     public static void readAuthModel() {
         String fusekiUrlBase = AuthProps.getProperty("fusekiAuthUrl");
+        if (fusekiUrlBase == null) {
+            log.error("fusekiAuthUrl not configured, not reading auth model");
+            return;
+        }
         log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
         fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
         int timeout = 5;
