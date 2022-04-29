@@ -42,7 +42,7 @@ public class Access {
     public final static Logger log = LoggerFactory.getLogger(Access.class.getName());
 
     public static enum AccessLevel {
-        OPEN, FAIR_USE, MIXED, NOACCESS
+        OPEN, FAIR_USE, MIXED, NOACCESS, THUMBNAIL
     }
     
     public static enum AccessRequest {

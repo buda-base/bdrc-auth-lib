@@ -51,6 +51,7 @@ public class Subscribers {
     public final static Logger log = LoggerFactory.getLogger(Subscribers.class.getName());
     
     public static Map<String,List<String>> collectionToSubscribers = null;
+    public static Map<String,List<String>> subscriberToCollections = null;
     public static Map<String,List<IPAddress>> subscriberToIPs = null;
     public static IPCache.Loader loader;
     
@@ -108,6 +109,12 @@ public class Subscribers {
                 collectionToSubscribers.put(collection, collectionSubscribers);
             }
             collectionSubscribers.add(subscriber);
+            List<String> subscriberCollections = subscriberToCollections.get(subscriber);
+            if (subscriberCollections == null) {
+                subscriberCollections = new ArrayList<>();
+                subscriberToCollections.put(subscriber, subscriberCollections);
+            }
+            subscriberCollections.add(collection);
         }
     }
     
@@ -131,6 +138,10 @@ public class Subscribers {
            log.error("error when loading cache for "+ipStr, e);
            return null;
         }
+    }
+    
+    public static List<String> collectionsOfSubscriber(final String subscriberLname) {
+        return subscriberToCollections.get(subscriberLname);
     }
     
     public static boolean collectionHasSubscriptions(final String collectionLname) {
