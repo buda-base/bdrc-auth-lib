@@ -78,6 +78,7 @@ public class Subscribers {
         }
         subscriberToIPs = new HashMap<>();
         collectionToSubscribers = new HashMap<>();
+        subscriberToCollections = new HashMap<>();
         // add IP addresses of subscribers
         StmtIterator itr = m.listStatements(null, hasIPAddress, (RDFNode)null);
         while (itr.hasNext()) {
