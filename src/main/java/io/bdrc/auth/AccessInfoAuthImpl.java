@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bdrc.auth.AccessInfoAuthImpl.AccessLevel;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.ResourceAccess;
 import io.bdrc.auth.model.User;
@@ -33,13 +34,13 @@ import io.bdrc.auth.rdf.Subscribers;
  * limitations under the License.
  ******************************************************************************/
 
-public class Access {
+public class AccessInfoAuthImpl implements AccessInfo {
 
     final UserProfile user;
     final Endpoint endpoint;
     final boolean isLogged;
 
-    public final static Logger log = LoggerFactory.getLogger(Access.class.getName());
+    public final static Logger log = LoggerFactory.getLogger(AccessInfoAuthImpl.class.getName());
 
     public static enum AccessLevel {
         OPEN, FAIR_USE, MIXED, NOACCESS, THUMBNAIL
@@ -49,7 +50,7 @@ public class Access {
         IMAGE, PDF, ETEXT
     }
 
-    public Access(final UserProfile user, final Endpoint endpoint) {
+    public AccessInfoAuthImpl(final UserProfile user, final Endpoint endpoint) {
         super();
         this.user = user;
         this.endpoint = endpoint;
@@ -57,7 +58,7 @@ public class Access {
         log.info("Initialized Access with User {}", user);
     }
 
-    public Access() {
+    public AccessInfoAuthImpl() {
         // default access for non-logged in users
         this.user = new UserProfile();
         this.endpoint = new Endpoint();
@@ -79,10 +80,6 @@ public class Access {
         boolean acc = matchResourcePermissions(accessType);
         log.info("Does User {} have resource Access ?", user, acc);
         return acc;
-    }
-
-    public boolean isUserLoggedIn() {
-        return !getUser().getUserId().equals("");
     }
     
     public AccessLevel hasResourceAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri) {
@@ -107,6 +104,9 @@ public class Access {
             return AccessLevel.OPEN;
         }
         if (RdfConstants.FAIR_USE.equals(resourceAccessLocalName)) {
+            // is this necessary? with the user.hasPermission above I'm not quite sure...
+            if (this.matchResourcePermissions(resourceAccessLocalName))
+                return AccessLevel.OPEN;
             return AccessLevel.FAIR_USE;
         }
         if (RdfConstants.MIXED.equals(resourceAccessLocalName)) {
@@ -226,7 +226,17 @@ public class Access {
 
     @Override
     public String toString() {
-        return "Access [user=" + user + ", endpoint=" + endpoint + "]";
+        return "Access [user=" + user + ", endpoint=" + endpoint + ", user= "+this.getUser().toString()+", userprofile="+this.getUserProfile().toString()+"]";
+    }
+
+    @Override
+    public boolean isLogged() {
+        return this.isLogged;
+    }
+    
+    @Override
+    public boolean isAdmin() {
+        return this.getUserProfile().isAdmin();
     }
 
 }
