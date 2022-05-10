@@ -36,6 +36,7 @@ public class AuthProps {
 
     public static void init(Properties props) {
         authProps = props;
+        log.error("authEnabled {} (=false ? {})", props.getProperty("authEnabled"), "false".equals(props.getProperty("authEnabled")));
         if (! "false".equals(props.getProperty("authEnabled"))) {
             BudaUserInfo.init();
         } else {
