@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.bdrc.auth.AccessInfoAuthImpl.AccessLevel;
 import io.bdrc.auth.model.Endpoint;
 import io.bdrc.auth.model.ResourceAccess;
 import io.bdrc.auth.model.User;
@@ -41,14 +40,6 @@ public class AccessInfoAuthImpl implements AccessInfo {
     final boolean isLogged;
 
     public final static Logger log = LoggerFactory.getLogger(AccessInfoAuthImpl.class.getName());
-
-    public static enum AccessLevel {
-        OPEN, FAIR_USE, MIXED, NOACCESS, THUMBNAIL
-    }
-    
-    public static enum AccessRequest {
-        IMAGE, PDF, ETEXT
-    }
 
     public AccessInfoAuthImpl(final UserProfile user, final Endpoint endpoint) {
         super();

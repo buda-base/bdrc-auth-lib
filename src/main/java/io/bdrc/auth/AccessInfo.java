@@ -2,9 +2,15 @@ package io.bdrc.auth;
 
 import java.util.List;
 
-import io.bdrc.auth.AccessInfoAuthImpl.AccessLevel;
-
 public interface AccessInfo {
+    
+    public static enum AccessLevel {
+        OPEN, FAIR_USE, MIXED, NOACCESS, THUMBNAIL
+    }
+    
+    public static enum AccessRequest {
+        IMAGE, PDF, ETEXT, DATA
+    }
 
     public AccessLevel hasResourcePDFAccess(final String resourceAccessLocalName, final String resourceStatusLocalName, final String resourceUri, final String ipAddress, final List<String> collections);
     
