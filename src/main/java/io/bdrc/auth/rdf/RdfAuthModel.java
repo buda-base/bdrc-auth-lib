@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -487,8 +488,13 @@ public class RdfAuthModel {
                 .queryEndpoint(fusekiUrlBase + "/query").gspEndpoint(fusekiUrlBase + "/data")
                 .updateEndpoint(fusekiUrlBase + "/update").httpClient(client);
         final RDFConnection fuConn = fuConnBuilder.build();
-        final Model m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
-        log.info("Got auth model");
+        Model m = null;
+        try {
+            m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
+            log.info("Got auth model");
+        } catch (HttpException e) {
+            log.error("can't read "+AuthProps.getProperty("authDataGraph"));
+        }
         if (m != null) {
             resetModel(m);
             update(System.currentTimeMillis());
