@@ -3,6 +3,8 @@ package io.bdrc.auth.rdf;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +12,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -482,14 +480,13 @@ public class RdfAuthModel {
         }
         log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
         fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
-        int timeout = 5;
-        RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-                .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrlBase)
+        final HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        final RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrlBase)
                 .queryEndpoint(fusekiUrlBase + "/query").gspEndpoint(fusekiUrlBase + "/data")
                 .updateEndpoint(fusekiUrlBase + "/update").httpClient(client);
-        RDFConnection fuConn = fuConnBuilder.build();
+        final RDFConnection fuConn = fuConnBuilder.build();
         final Model m = fuConn.fetch(AuthProps.getProperty("authDataGraph"));
         log.info("Got auth model");
         if (m != null) {
@@ -543,7 +540,7 @@ public class RdfAuthModel {
     }
 
     public static void main(String[] args)
-            throws ClientProtocolException, IOException, InterruptedException, ExecutionException {
+            throws IOException, InterruptedException, ExecutionException {
         // Properties props = new Properties();
         // InputStream input =
         // Rdf.class.getClassLoader().getResourceAsStream("iiifpres.properties");

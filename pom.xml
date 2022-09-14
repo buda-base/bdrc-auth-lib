@@ -3,7 +3,7 @@
   <groupId>io.bdrc</groupId>
   <artifactId>bdrc-auth-lib</artifactId>
   <packaging>jar</packaging>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <name>bdrc-auth-lib</name>
   <description>BDRC authorization library based on auth0</description>
   <url>https://github.com/buda-base/bdrc-auth-lib</url>
@@ -15,9 +15,9 @@
     </licenses>  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <jena.version>3.14.0</jena.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <jena.version>4.6.1</jena.version>
   </properties>
   <developers>
         <developer>
@@ -47,30 +47,30 @@
     <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>auth0</artifactId>
-        <version>1.29.0</version>
+        <version>1.42.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
     <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.15.0</version>
+        <version>4.0.0</version>
     </dependency>
     <dependency>
         <groupId>com.github.seancfoley</groupId>
         <artifactId>ipaddress</artifactId>
-        <version>5.3.3</version>
+        <version>5.3.4</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.25</version>
+        <version>1.7.36</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.25</version>
+        <version>1.7.36</version>
     </dependency>
      <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
     <dependency>
@@ -110,7 +110,7 @@
                     <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.0.1</version>
                     <executions>
                       <execution>
                         <id>sign-artifacts</id>
@@ -149,7 +149,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -158,10 +158,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,16 +166,6 @@
                           <useSystemClassLoader>false</useSystemClassLoader>
                         </configuration>          
                 </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
             <plugin>
               <groupId>com.github.spotbugs</groupId>
               <artifactId>spotbugs-maven-plugin</artifactId>

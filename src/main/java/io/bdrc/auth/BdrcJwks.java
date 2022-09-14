@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Verification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,8 +52,6 @@ public class BdrcJwks {
     public final static Logger log = LoggerFactory
             .getLogger(BdrcJwks.class.getName());
 
-    public static final String ALG = PublicClaims.ALGORITHM;
-    public static final String KID = PublicClaims.KEY_ID;
     public static final String KTY = "kty";
     public static final String USE = "use";
     public static final String X5C = "x5c";

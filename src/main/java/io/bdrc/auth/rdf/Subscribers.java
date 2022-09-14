@@ -1,6 +1,8 @@
 package io.bdrc.auth.rdf;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,15 +61,14 @@ public class Subscribers {
         String fusekiUrlBase = AuthProps.getProperty("fusekiAuthUrl");
         log.info("Read AUTH model {} from {}", AuthProps.getProperty("authDataGraph"), fusekiUrlBase);
         fusekiUrlBase = fusekiUrlBase.substring(0, fusekiUrlBase.lastIndexOf("/"));
-        int timeout = 5;
-        RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-                .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrlBase)
+        final HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        final RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrlBase)
                 .queryEndpoint(fusekiUrlBase + "/query").gspEndpoint(fusekiUrlBase + "/data")
                 .updateEndpoint(fusekiUrlBase + "/update").httpClient(client);
-        RDFConnection fuConn = fuConnBuilder.build();
-        Query q = QueryFactory.create(SUBSCRIBERS_SPARQL);
+        final RDFConnection fuConn = fuConnBuilder.build();
+        final Query q = QueryFactory.create(SUBSCRIBERS_SPARQL);
         return fuConn.queryConstruct(q);
     }
     
