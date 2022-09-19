@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,6 +38,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -93,68 +95,93 @@ public class AuthDataModelBuilder {
     public static String auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
     static String token = null;
     static String token2 = null;
-    // authUsersDataGraph
-    public AuthDataModelBuilder() throws ClientProtocolException, IOException, InterruptedException {
-        usersRolesMap = new HashMap<>();
-        webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
-        auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
-        log.info("URL >> " + AuthProps.getProperty("policiesUrl"));
-        HttpURLConnection connection = (HttpURLConnection) new URL(AuthProps.getProperty("policiesUrl"))
-                .openConnection();
-        InputStream stream = connection.getInputStream();
+    
+    static Model getPoliciesModel() {
+    	final String url = AuthProps.getProperty("policiesUrl");
+    	log.info("read auth policy on {}", url);
+        HttpURLConnection connection;
+        InputStream stream;
+		try {
+			connection = (HttpURLConnection) new URL(url)
+			        .openConnection();
+			stream = connection.getInputStream();
+		} catch (IOException e1) {
+			log.error("can't get policy model on "+url, e1);
+			return null;
+		}
         final Model authMod = ModelFactory.createDefaultModel();
         try {
             authMod.read(stream, "", "TURTLE");
         } catch (RiotException e) {
             log.error("error reading "+AuthProps.getProperty("policiesUrl"), e);
         }
-        stream.close();
+        try {
+			stream.close();
+		} catch (IOException e) {
+			log.error("can't close policy http input stream on "+url, e);
+		}
+        return authMod;
+    }
+    
+    public static String getToken(final String audience) {
         HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpPost post = null;
-        post = new HttpPost("https://bdrc-io.auth0.com/oauth/token");
+        post = new HttpPost(auth0BaseUrl + "oauth/token");
         HashMap<String, String> json = new HashMap<>();
         json.put("grant_type", "client_credentials");
         json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
         json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience", "urn:auth0-authz-api");
-        String post_data = mapper.writer().writeValueAsString(json);
-        StringEntity se = new StringEntity(post_data);
+        json.put("audience", audience);
+        String post_data;
+		try {
+			post_data = mapper.writer().writeValueAsString(json);
+		} catch (JsonProcessingException e) {
+			log.error("can't serialize json (this shouldn't happen)", e);
+			return null;
+		}
+        StringEntity se;
+		try {
+			se = new StringEntity(post_data);
+		} catch (UnsupportedEncodingException e) {
+			log.error("can't serialize post data (this shouldn't happen)", e);
+			return null;
+		}
         se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         post.setEntity(se);
-        HttpResponse response = client.execute(post);
+        HttpResponse response;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        response.getEntity().writeTo(baos);
-        String json_resp = baos.toString();
-        // log.info("MAP >> {}", json);
-        baos.close();
-        JsonNode node = mapper.readTree(json_resp);
-        String token = node.findValue("access_token").asText();
-        model = ModelFactory.createDefaultModel();
-        model.add(authMod);
+        String json_resp;
+		try {
+			response = client.execute(post);
+			response.getEntity().writeTo(baos);
+			json_resp = baos.toString();
+			baos.close();
+		} catch (IOException e) {
+			log.error("can't get answer from auth0 for audience", audience, e);
+			return null;
+		}
+        JsonNode node;
+		try {
+			node = mapper.readTree(json_resp);
+		} catch (JsonProcessingException e) {
+			log.error("can't read json {}", json_resp, e);
+			return null;
+		}
+        return node.findValue("access_token").asText();
+    }
+    
+    public AuthDataModelBuilder() throws ClientProtocolException, IOException, InterruptedException {
+        usersRolesMap = new HashMap<>();
+        webTaskBaseUrl = AuthProps.getProperty("webTaskBaseUrl");
+        auth0BaseUrl = AuthProps.getProperty("auth0BaseUrl");
+        model = getPoliciesModel();
+        token = getToken("urn:auth0-authz-api");
+        token2 = getToken(auth0BaseUrl + "api/v2/");
         setGroups(token);
         setRoles(token);
         setPermissions(token);
-        setEndpoints(authMod);
-        setResourceAccess(authMod);
-        // Apps and users require a call with a different audience
-        client = HttpClientBuilder.create().build();
-        post = new HttpPost(auth0BaseUrl + "oauth/token");
-        json = new HashMap<>();
-        json.put("grant_type", "client_credentials");
-        json.put("client_id", AuthProps.getProperty("lds-pdiClientID"));
-        json.put("client_secret", AuthProps.getProperty("lds-pdiClientSecret"));
-        json.put("audience", auth0BaseUrl + "api/v2/");
-        post_data = mapper.writer().writeValueAsString(json);
-        se = new StringEntity(post_data);
-        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        post.setEntity(se);
-        response = client.execute(post);
-        baos = new ByteArrayOutputStream();
-        response.getEntity().writeTo(baos);
-        json_resp = baos.toString();
-        baos.close();
-        node = mapper.readTree(json_resp);
-        token2 = node.findValue("access_token").asText();
+        setEndpoints(model);
+        setResourceAccess(model);
         setUsers(token2);
         setApps(token2);
         setUsersRolesMap();
