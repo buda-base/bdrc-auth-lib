@@ -11,9 +11,11 @@ import java.util.Map;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -69,7 +71,14 @@ public class Subscribers {
                 .updateEndpoint(fusekiUrlBase + "/update").httpClient(client);
         final RDFConnection fuConn = fuConnBuilder.build();
         final Query q = QueryFactory.create(SUBSCRIBERS_SPARQL);
-        return fuConn.queryConstruct(q);
+        Model res = ModelFactory.createDefaultModel();
+        try {
+        	res = fuConn.queryConstruct(q);
+        } catch (HttpException e) {
+        	log.error("error running query "+q+" on "+fusekiUrlBase);
+        }
+        fuConn.close();
+        return res;
     }
     
     public static void parseModel(Model m) {
