@@ -188,21 +188,20 @@ public class UserManager {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static List<JsonNode> downloadUsers(String token)
+	public static List<JsonNode> downloadUsers(final String token)
 			throws IOException, InterruptedException {
 		UserManager.initConnectionJobs(token);
 		UserManager.pendingJobs();
-		log.info("Preparing jobs >>");
+		log.info("Preparing jobs for user download from auth0 >>");
 		UserManager.prepareJobs(token);
-		log.info(
-				"Done preparing jobs >> {}" + UserManager.getConnectionJobs());
-		ObjectMapper mapper = new ObjectMapper();
-		List<JsonNode> nodes = new ArrayList<>();
+		log.info("Done preparing jobs >> {}" + UserManager.getConnectionJobs());
+		final ObjectMapper mapper = new ObjectMapper();
+		final List<JsonNode> nodes = new ArrayList<>();
 		for (String conn : connectionsJobs.keySet()) {
-			String location = connectionsJobs.get(conn).getLocation();
-			URL url = new URL(location);
-			GZIPInputStream gis = new GZIPInputStream(url.openStream());
-			BufferedReader reader = new BufferedReader(
+			final String location = connectionsJobs.get(conn).getLocation();
+			final URL url = new URL(location);
+			final GZIPInputStream gis = new GZIPInputStream(url.openStream());
+			final BufferedReader reader = new BufferedReader(
 					new InputStreamReader(gis));
 			String json = reader.readLine();
 			while (json != null) {
@@ -212,6 +211,7 @@ public class UserManager {
 			gis.close();
 			reader.close();
 		}
+		log.info("downloaded {} users", nodes.size());
 		return nodes;
 	}
 
@@ -287,7 +287,7 @@ public class UserManager {
 			}
 			Thread.sleep(2000);
 			pending = pendingJobs();
-			log.info("PENDING SIZE = {}", pending.size());
+			log.info("jobs pending size: {}", pending.size());
 		}
 	}
 
