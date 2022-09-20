@@ -526,13 +526,19 @@ public class RdfAuthModel {
             fusekiUrl = AuthProps.getProperty("fusekiAuthUrl");
         }
         fusekiUrl = fusekiUrl.substring(0, fusekiUrl.lastIndexOf("/"));
+        final HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        final RDFConnectionRemoteBuilder fuConnBuilder = RDFConnectionFuseki.create().destination(fusekiUrl)
+                .queryEndpoint(fusekiUrl + "/query").gspEndpoint(fusekiUrl + "/data")
+                .updateEndpoint(fusekiUrl + "/update").httpClient(client);
+        final RDFConnection fuConn = fuConnBuilder.build();
         log.info("Service fuseki >> " + fusekiUrl);
         log.info("authDataGraph >> " + AuthProps.getProperty("authDataGraph"));
         try {
             final AuthDataModelBuilder auth = new AuthDataModelBuilder();
-            RDFConnectionFuseki rvf = RDFConnectionFactory.connectFuseki(fusekiUrl);
-            rvf.put(AuthProps.getProperty("authDataGraph"), auth.getModel());
-            rvf.close();
+            fuConn.put(AuthProps.getProperty("authDataGraph"), auth.getModel());
+            fuConn.close();
             resetModel(auth.getModel());
         } catch (IOException e) {
             log.error("", e);
