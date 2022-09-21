@@ -19,4 +19,8 @@ public interface AccessInfo {
     public boolean isLogged();
     
     public boolean isAdmin();
+    
+    public String getId();
+    
+    public boolean hasEndpointAccess();
 }

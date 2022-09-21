@@ -230,4 +230,9 @@ public class AccessInfoAuthImpl implements AccessInfo {
         return this.getUserProfile().isAdmin();
     }
 
+	@Override
+	public String getId() {
+		return this.getUser().getAuthId();
+	}
+
 }
