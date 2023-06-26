@@ -112,6 +112,14 @@ public class UserProfile {
     public boolean isAdmin() {
         return groups.contains(RdfAuthModel.adminGroupId);
     }
+    
+    public boolean isEditor() {
+        return groups.contains(RdfAuthModel.editorsGroupId);
+    }
+    
+    public boolean isContributor() {
+        return groups.contains(RdfAuthModel.contributorsGroupId);
+    }
 
     public ArrayList<String> getGroups() {
         return groups;

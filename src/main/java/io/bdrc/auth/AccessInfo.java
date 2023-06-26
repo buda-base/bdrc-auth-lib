@@ -20,6 +20,10 @@ public interface AccessInfo {
     
     public boolean isAdmin();
     
+    public boolean isEditor();
+    
+    public boolean isContributor();
+    
     public String getId();
     
     public boolean hasEndpointAccess();

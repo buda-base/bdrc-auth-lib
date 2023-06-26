@@ -79,6 +79,8 @@ public class RdfAuthModel {
     static HashMap<String, ArrayList<String>> paths;
     static Long updated = null;
     public static String adminGroupId;
+    public static String editorsGroupId;
+    public static String contributorsGroupId;
 
     public final static Logger log = LoggerFactory.getLogger(RdfAuthModel.class.getName());
 
@@ -193,6 +195,10 @@ public class RdfAuthModel {
             gp.setDesc(rs.getProperty(RdfConstants.DESC).getObject().toString());
             if (gp.getName().equals("admin")) {
                 adminGroupId = gp.getId();
+            } else if (gp.getName().equals("editors")) {
+                editorsGroupId = gp.getId();
+            } else if (gp.getName().equals("contributors")) {
+                contributorsGroupId = gp.getId();
             }
             groups.put(getShortName(rs.getURI()), gp);
         }

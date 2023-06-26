@@ -229,6 +229,16 @@ public class AccessInfoAuthImpl implements AccessInfo {
     public boolean isAdmin() {
         return this.getUserProfile().isAdmin();
     }
+    
+    @Override
+    public boolean isEditor() {
+        return this.getUserProfile().isEditor();
+    }
+    
+    @Override
+    public boolean isContributor() {
+        return this.getUserProfile().isContributor();
+    }
 
 	@Override
 	public String getId() {
