@@ -66,7 +66,7 @@ import io.bdrc.auth.model.User;
  */
 public class RdfAuthModel {
 
-    static Model authMod;
+    static Model authMod = null;
     static HashMap<String, User> users;
     static HashMap<String, Group> groups;
     static HashMap<String, Role> roles;
@@ -130,6 +130,10 @@ public class RdfAuthModel {
             return users;
         }
         users = new HashMap<String, User>();
+        if (authMod == null) {
+            log.error("authMod is null");
+            return users;
+        }
         final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.USER);
         while (it.hasNext()) {
             final Resource rs = it.next();
@@ -176,6 +180,10 @@ public class RdfAuthModel {
             return groups;
         }
         groups = new HashMap<String, Group>();
+        if (authMod == null) {
+            log.error("authMod is null");
+            return groups;
+        }
         final ResIterator it = authMod.listResourcesWithProperty(RDF.type, RdfConstants.GROUP);
         while (it.hasNext()) {
             final Group gp = new Group();
