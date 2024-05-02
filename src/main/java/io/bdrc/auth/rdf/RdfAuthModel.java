@@ -409,6 +409,8 @@ public class RdfAuthModel {
             return anyStatusGroups;
         }
         anyStatusGroups = new ArrayList<>();
+        if (authMod == null)
+            return anyStatusGroups;
         final ResIterator it = authMod.listResourcesWithProperty(RdfConstants.ANY_STATUS);
         while (it.hasNext()) {
             final Resource rs = it.next();
