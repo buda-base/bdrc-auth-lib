@@ -44,8 +44,7 @@ public class Endpoint {
         roles = new ArrayList<>();
         permissions = new ArrayList<>();
         methods = new ArrayList<>();
-        Triple t = new Triple(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
-        ExtendedIterator<Triple> ext = model.getGraph().find(t);
+        final ExtendedIterator<Triple> ext = model.getGraph().find(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
         while (ext.hasNext()) {
             final Triple tmp = ext.next();
             final String value = tmp.getObject().toString().replaceAll("\"", "");
