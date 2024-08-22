@@ -317,8 +317,7 @@ public class AuthDataModelBuilder {
         log.info("Setting endpoints >> ");
         endpoints = new ArrayList<>();
         paths = new ArrayList<>();
-        final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.ENDPOINT.asNode());
-        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
+        final ExtendedIterator<Triple> ext = authMod.getGraph().find(Node.ANY, RDF.type.asNode(), RdfConstants.ENDPOINT.asNode());
         while (ext.hasNext()) {
             final String st = ext.next().getSubject().getURI();
             final Endpoint end = new Endpoint(authMod, st);
@@ -329,8 +328,7 @@ public class AuthDataModelBuilder {
 
     private void setResourceAccess(Model authMod) throws ClientProtocolException, IOException {
         access = new ArrayList<>();
-        final Triple t = new Triple(Node.ANY, RDF.type.asNode(), RdfConstants.RES_ACCESS.asNode());
-        final ExtendedIterator<Triple> ext = authMod.getGraph().find(t);
+        final ExtendedIterator<Triple> ext = authMod.getGraph().find(Node.ANY, RDF.type.asNode(), RdfConstants.RES_ACCESS.asNode());
         while (ext.hasNext()) {
             final String st = ext.next().getSubject().getURI();
             final ResourceAccess acc = new ResourceAccess(authMod, st);

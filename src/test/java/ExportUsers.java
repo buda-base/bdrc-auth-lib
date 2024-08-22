@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.auth0.client.auth.AuthAPI;
-import com.auth0.net.AuthRequest;
+import com.auth0.net.TokenRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,12 +67,12 @@ public class ExportUsers {
     }
 
     private static void setAdminToken() throws IOException {
-        AuthRequest req = auth.login("tchame@rimay.net",
+        TokenRequest req = auth.login("tchame@rimay.net",
                 props.getProperty("tchame@rimay.net").toCharArray());
         log.info("Request >>" + req);
         req.setScope("openid profile");
         req.setAudience("https://bdrc-io.auth0.com/api/v2/");
-        adminToken = req.execute().getIdToken();
+        adminToken = req.execute().getBody().getIdToken();
         log.info("admin Token >> {}", adminToken);
     }
 

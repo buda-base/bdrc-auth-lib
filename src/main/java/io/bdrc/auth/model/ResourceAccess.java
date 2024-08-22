@@ -34,8 +34,7 @@ public class ResourceAccess {
     String permission = "";
 
     public ResourceAccess(final Model model, final String resourceId) {
-        final Triple t = new Triple(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
-        final ExtendedIterator<Triple> ext = model.getGraph().find(t);
+        final ExtendedIterator<Triple> ext = model.getGraph().find(NodeFactory.createURI(resourceId), Node.ANY, Node.ANY);
         while (ext.hasNext()) {
             final Triple tmp = ext.next();
             final String prop = tmp.getPredicate().getURI();
